@@ -1,0 +1,398 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import TrustBanner from '../../components/TrustBanner.astro';
+import SourceSnapshotBanner from '../../components/SourceSnapshotBanner.astro';
+import InstallCTA from '../../components/InstallCTA.astro';
+import { ISLANDS } from '../../data/islands';
+import { useTranslations } from '../../i18n/ui';
+import { LOCALES, localeUrl } from '../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/network';
+const hreflangLocales = publishedLocalesFor(path);
+
+/** The island whose dataset stays valid longest — the least stale claim we can make. */
+const widestValidity = ISLANDS.reduce((best, island) =>
+  (island.dataValidTo ?? '') > (best.dataValidTo ?? '') ? island : best,
+);
+const dateModified = '2026-09-28';
+
+const myths = [
+  {
+    myth: 'There will be a bus back from the beach at midnight.',
+    fact: 'No island in this family runs a scheduled night service. After the last departure the options are a taxi, a walk, or a night in town. Plan the day around the last bus, not around dinner.',
+  },
+  {
+    myth: 'The bus will wait for our ferry.',
+    fact: 'Plan for no wait. On a late landing the connecting bus has usually gone. Assume any connection you build has no slack at all, and add your own margin.',
+  },
+  {
+    myth: 'If the timetable says 14:15, the bus will be there at 14:15.',
+    fact: 'That is the scheduled time, and it is exactly what we publish. We have no vehicle feed, so we cannot tell you whether it is running, delayed, or cancelled. The number on this site is a schedule, not an observation.',
+  },
+  {
+    myth: 'The bus will run a bit late, so we have slack.',
+    fact: 'Some lines do run late. Others run to the minute because the driver is on a fixed shift and the timetable is what the shift is measured against. Never build a plan that depends on slack you have not seen yourself.',
+  },
+  {
+    myth: 'There is a bus to every beach.',
+    fact: 'There is a bus to a village, and sometimes a seasonal shuttle to a beach. The village is the destination. Getting from the last village stop to the sand is usually a walk, and on a July afternoon it is a long one.',
+  },
+] as const;
+---
+
+<BaseLayout
+  title="How Cyclades island buses actually work"
+  description="Why island buses are hard to rely on: hub networks, two timetables a year, the last-bus problem, ferry connections, cancellations and how fares are paid."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'How it works', path },
+    ]),
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">How it works</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('network.title')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      Last updated: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      {t('network.lede')}
+    </p>
+
+    <TrustBanner locale={locale} class="mt-6 max-w-3xl" />
+
+    <p class="prose-measure mt-8 leading-relaxed text-[var(--color-ink-soft)]">
+      This page describes the shape of island bus services in the Cyclades. It is written from the
+      published timetables and from the structure of the networks, not from any vehicle feed. Every
+      time on this site is the operator's own schedule, dated. Nothing here is an observation of a bus
+      on a road.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Why island buses feel unpredictable
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      An island bus service is not a network in the sense a city bus service is a network. It is a
+      handful of radial lines, most of which run hourly or better in the middle of the day and much
+      less often at the two ends of it. The service was designed around residents' commuting hours
+      and the school day, not around visitors. School holidays, the school day itself, the shop
+      opening hour and the ferry timetable all shape it.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      The result is a service that is good enough that you do not need to plan a day in advance, and
+      unreliable at exactly the points where people get stuck. The two ends of the day are the
+      problem. Everything in between is usually fine.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The hub: lines radiate, they do not mesh
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Almost every island network is a set of spokes from one or two centres: the Port on Naxos,
+      Parikia on Paros, Fira on Santorini, Adamas on Milos, the Port on Ios. Two lines cross at the
+      hub, or in a village that happens to sit on both corridors. Almost never anywhere else.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      So the trip you imagined — a direct ride from one side of the island to the other — usually
+      does not exist. It becomes a ride to the hub, a wait, and a second ride out. That is not a
+      flaw in our planner. It is the shape of the service. A planner that hid the transfer and
+      showed you a single through-journey would be lying to you, and one that refused to show the
+      transfer at all would be useless.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      A useful rule: if a journey does not pass near the hub, assume it needs two buses or a taxi.
+      Santorini adds a second constraint, because the caldera rim at Fira is a walking-only centre
+      with no bus through it.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The first and last bus problem
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      The number people actually need is the last departure, not the first. Every line page in this
+      family shows the first and the last service of the day for that line, because the last one is
+      the one that decides where you can eat, swim and sleep.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      After the last bus there are exactly three options, and it is worth deciding which one before
+      you need it.
+    </p>
+    <ul class="prose-measure mt-4 space-y-2.5">
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">A taxi.</strong> Fares are agreed
+          with the driver, are several times the price of the bus ticket you just missed, and are
+          hard to find at the far end of a line. There are telephone numbers on every operator
+          page here.
+        </span>
+      </li>
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Walking.</strong> Perfectly
+          reasonable within a town or to the next village along the road. A bad idea in July sun
+          with a suitcase, and a much worse idea with small children at six in the evening.
+        </span>
+      </li>
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Staying in town.</strong> The
+          cheapest and most common answer. Dinner near the port, an evening in, the bus in the
+          morning. Most of the best food and the best bars are within walking distance of a hub
+          anyway.
+        </span>
+      </li>
+    </ul>
+    <p class="prose-measure mt-4 text-sm leading-relaxed text-[var(--color-muted)]">
+      The first bus of the day has the same shape of problem. On outer corridors it can be after
+      07:00, and a line that runs hourly in the afternoon may run only a few times in the early
+      morning. Check the specific line rather than assuming symmetry.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Two timetables a year, not one
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Islands that carry a meaningful volume of ferry passengers run two timetables: a winter one for
+      residents, and a summer one that adds services for visitors. The changeover is tied to the
+      ferry season rather than to a calendar date, so it moves by a few days each year. Some lines
+      exist in only one of the two. Some lines have a different route in each.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      This is the single most common reason a schedule here looks wrong to somebody: you are reading
+      the summer timetable at the end of October, or the winter timetable in July. Every dataset we
+      publish carries a date after which it is no longer trustworthy, and this site is built from a
+      single dated snapshot per island. The dates are printed on every island page. When the validity
+      date passes, the build fails rather than shipping a stale schedule, which is uncomfortable and
+      deliberate.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Luggage, children and limited mobility
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      This family of planners publishes route, timetable and fare information. It does not publish
+      boarding, accessibility or vehicle information, and we do not have a reliable source for it.
+      That is a scope limit we state rather than fill with guesswork.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      What you can do, and what to ask the operator before you rely on it:
+    </p>
+    <ul class="prose-measure mt-4 space-y-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Large luggage.</strong> Many of
+          these are small midibus coaches with a rear hold. Bags in the hold reduce the number of
+          large cases you can travel with, so ask what the vehicle takes before you pack for three
+          people and a week.
+        </span>
+      </li>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Pushchairs and children.</strong>
+          Whether a pushchair can go in the aisle or the luggage space is a property of the
+          vehicle, not of the line. Ask. Also ask whether a travelling adult is charged, because
+          the fare rules for that are not published consistently across the islands.
+        </span>
+      </li>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Limited mobility.</strong> Road
+          position, kerb height, whether the vehicle can stop at all, and whether the driver will
+          deviate from the stop are all questions for the operator. The stop position we publish is
+          a mapped point, not a boarding instruction.
+        </span>
+      </li>
+    </ul>
+    <p class="prose-measure mt-4 text-sm leading-relaxed text-[var(--color-muted)]">
+      What helps regardless: be at the stop a few minutes early, put large cases in the hold first,
+      and travel with a paper copy or a screenshot of the timetable in case your phone runs flat.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Ferry to bus connections, and the realistic wait
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      A ferry landing is the hardest case a bus timetable has to cope with, and on the Cyclades it is
+      the case that breaks most often. Ships are scheduled against tide, port congestion and berth
+      availability. Buses are scheduled against a printed grid set weeks earlier. When the ship is
+      late, the bus has almost always gone.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      So the rule is: plan for no wait. Treat a timed connection as a bonus rather than as a plan,
+      and if you genuinely need to be somewhere, allow yourself a margin of at least fifteen or twenty
+      minutes on top of it — more on a sailing that crosses from another island. On a few routes the
+      last bus out of the port is timed to the scheduled arrival of a specific sailing rather than
+      to the last sailing of the day, which makes the dependency even tighter.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      <Icon name="ferry" size={15} class="mr-1 inline align-[-0.15em] text-[var(--color-sea)]" />
+      The same reasoning applies in reverse when you are leaving: get to the port with time to spare,
+      because the ferry is the fixed point in your day and the bus is not.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      When a service does not run
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Nobody tells you in advance. This is a structural feature of how these services are run, not a
+      gap in this site. A small cooperative on a small island runs a small fleet with no central
+      dispatch that can push a message to your phone, and no passenger information system worth the
+      name. There is no disruption feed to show you, because there is no feed to show you.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Services do get cancelled. A vehicle breaks down, a driver is unavailable, a road closes for an
+      event, a local dispute stops a line for a day. When that happens the timetable is usually not
+      revised — the service simply does not appear. Nothing in the published schedule will tell you
+      that, on the day, either.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      What follows from that is a habit rather than a tool. Check with the operator's telephone
+      number on the morning you intend to travel. Take the departure you need rather than the one
+      that is slightly later. Treat any connection you have built as fragile. And if you find that
+      the printed schedule you relied on was out of date, tell us so the next reader does not find
+      it the same way.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Fares and how to pay
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Fares are set by the operator, not by us. We take no commission, we sell nothing, and we are
+      not a ticket sales office.
+    </p>
+    <ul class="prose-measure mt-4 space-y-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Pay the driver, in cash.</strong>
+          These are cash services. Assume no card machine and no ticket office, and carry euros in
+          small notes.
+        </span>
+      </li>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">One fare per leg.</strong> There is
+          generally no through-fare across a change at the hub. A journey with a transfer is two
+          tickets, and the second one is not discounted.
+        </span>
+      </li>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">Have the right money ready.</strong>
+          A short-fare conversation on a moving bus, in a queue, holding up a line, is the one
+          avoidable friction of the whole day. Get the fare settled before you step on if you can.
+        </span>
+      </li>
+      <li class="flex gap-2.5">
+        <span class="mt-0.5 shrink-0 text-[var(--color-aegean)]" aria-hidden="true">—</span>
+        <span>
+          <strong class="font-semibold text-[var(--color-ink)]">The fare is often a flat rate per
+          route.</strong> On several of these networks a short ride and a long ride on the same line
+          cost the same, which is why the number looks wrong when you compare it to a mainland
+          distance-based fare. Check the operator's own published fare before you travel, and tell us
+          if our figure is drifting from theirs.
+        </span>
+      </li>
+    </ul>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Five things people get wrong
+    </h2>
+    <ul class="mt-5 space-y-4">
+      {
+        myths.map((item) => (
+          <li class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)]">
+            <p class="text-sm font-semibold text-[var(--color-ink)]">
+              <span class="text-[var(--color-muted)]">Myth:</span> {item.myth}
+            </p>
+            <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+              <span class="font-semibold text-[var(--color-aegean-deep)]">Reality:</span> {item.fact}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Take the planner with you
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Every island in this family has a free planner that installs on your phone and works with no
+      signal. Open a line, see the first and the last departure, see the fare, save the page. It
+      costs nothing, needs no account, and does not send anything to anybody.
+    </p>
+
+    <SourceSnapshotBanner island={widestValidity} class="mt-10" />
+
+    <div class="mt-12">
+      <h2 class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+        Pick your island
+      </h2>
+      <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        Every island in this family has a free planner that installs on your phone and works with no
+        signal. The times it shows are the operator's printed schedule, with the date they were
+        retrieved.
+      </p>
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {
+          ISLANDS.slice(0, 4).map((island) => (
+            <div class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+              <h3 class="text-base font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+                {island.brand}{' '}
+                <span class="text-sm font-normal text-[var(--color-muted)]">— {island.name}</span>
+              </h3>
+              <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">{island.blurb.en}</p>
+              <InstallCTA island={island} variant="inline" class="mt-4" />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-3">
+      <a
+        href={localeUrl(locale, '/islands')}
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline transition-colors hover:bg-[var(--color-aegean-btn-hover)]"
+      >
+        {t('hero.ctaPrimary')}
+        <Icon name="arrow-right" size={16} />
+      </a>
+      <a
+        href={localeUrl(locale, '/data/quality')}
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 text-sm font-semibold text-[var(--color-ink-soft)] no-underline transition-colors hover:bg-[var(--color-surface-2)]"
+      >
+        {t('data.quality')}
+      </a>
+    </div>
+  </div>
+</BaseLayout>

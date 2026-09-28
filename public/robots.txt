@@ -1,0 +1,65 @@
+# CycladesGo — https://cycladesgo.com/
+# Independent project. Unofficial: not affiliated with, endorsed by or operated
+# by any KTEL or bus operator, and not a ticket sales office.
+#
+# We publish factual, openly licensed transit data (CC-BY / ODbL) and we welcome
+# search and AI crawlers. We do NOT syndicate our data to transit aggregators —
+# see https://cycladesgo.com/en/data/open-data. That is a policy, not a robots rule: no
+# robots.txt can enforce it.
+
+User-agent: *
+Allow: /
+Crawl-delay: 1
+
+# --- OpenAI ---------------------------------------------------------------
+# OAI-SearchBot powers ChatGPT search citations. Blocking it removes us from
+# answers; allow it.
+User-agent: OAI-SearchBot
+Allow: /
+# GPTBot is model training. Allowed: our data is openly licensed.
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-AdsBot
+Allow: /
+
+# --- Anthropic ------------------------------------------------------------
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+
+# --- Perplexity -----------------------------------------------------------
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+
+# --- Google ---------------------------------------------------------------
+# Googlebot is covered by the wildcard above and MUST stay allowed: blocking it
+# also removes the site from AI Overviews and AI Mode.
+# Google-Extended governs Gemini training/grounding only. It has no effect on
+# Search ranking or AI Overviews.
+User-agent: Google-Extended
+Allow: /
+
+# --- Others ---------------------------------------------------------------
+User-agent: CCBot
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: Amazonbot
+Allow: /
+
+# Aggressive scraper with no indexing value for us.
+User-agent: Bytespider
+Disallow: /
+
+Sitemap: https://cycladesgo.com/sitemap-index.xml

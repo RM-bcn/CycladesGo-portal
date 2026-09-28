@@ -1,0 +1,43 @@
+---
+import Icon from './ui/Icon.astro';
+import { useTranslations } from '../i18n/ui';
+import type { Locale } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+  variant?: 'bar' | 'badge';
+  class?: string;
+}
+const { locale, variant = 'bar', class: className = '' } = Astro.props;
+const t = useTranslations(locale);
+
+const items = [
+  { icon: 'unofficial', key: 'trust.unofficial' },
+  { icon: 'clock', key: 'trust.scheduled' },
+  { icon: 'database', key: 'trust.openData' },
+  { icon: 'shield', key: 'trust.noTracking' },
+] as const;
+---
+
+{
+  variant === 'bar' ? (
+    <div
+      class={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-aegean-bg)] px-4 py-2.5 text-xs font-medium text-[var(--color-aegean-deep)] ${className}`}
+      role="note"
+    >
+      {items.map((item) => (
+        <span class="inline-flex items-center gap-1.5">
+          <Icon name={item.icon} size={14} />
+          {t(item.key)}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <span
+      class={`inline-flex items-center gap-1.5 rounded-full border border-[var(--color-sun)] bg-[var(--color-sun-bg)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-sun-ink)] ${className}`}
+    >
+      <Icon name="unofficial" size={12} />
+      {t('trust.unofficial')}
+    </span>
+  )
+}

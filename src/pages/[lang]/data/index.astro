@@ -1,0 +1,246 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import Card from '../../../components/ui/Card.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import TrustBanner from '../../../components/TrustBanner.astro';
+import { ISLANDS } from '../../../data/islands';
+import { SITE } from '../../../data/site';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/data';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+const cards = [
+  {
+    icon: 'database',
+    href: '/data/methodology',
+    title: 'Methodology',
+    body: 'The whole pipeline, island by island: which operator page each timetable came from, how stop names were matched to OpenStreetMap, and how intermediate times were calculated.',
+    linkLabel: 'How we get our data',
+  },
+  {
+    icon: 'warning',
+    href: '/data/quality',
+    title: 'Known limits',
+    body: 'The page to read before you rely on any time here. No vehicle feed, the interpolation error bound, the validity window, and what we deliberately do not cover at all.',
+    linkLabel: 'Read the known limits',
+  },
+  {
+    icon: 'clock',
+    href: '/data/changelog',
+    title: 'Changelog',
+    body: 'A dated record of every change to the published datasets, including the two incidents that took an island offline and the fixes that followed them.',
+    linkLabel: 'See the changelog',
+  },
+  {
+    icon: 'download',
+    href: '/data/open-data',
+    title: 'Open data',
+    body: 'The URLs, the licences, and the short list of aggregators we deliberately do not feed. The data is yours to download and build on.',
+    linkLabel: 'Data licence and URLs',
+  },
+] as const;
+
+const networkDataset = {
+  '@type': 'Dataset',
+  '@id': `${SITE.url}/data/#network-dataset`,
+  name: 'CycladesGo island bus network dataset',
+  description:
+    'Stops, lines, scheduled departures and curated fares for the published CycladesGo island networks. Times are the operator schedules, not observations. Intermediate stop times are interpolated. No vehicle positions are included.',
+  url: `${SITE.url}${localeUrl(locale, '/data')}`,
+  license: 'https://creativecommons.org/licenses/by/4.0/',
+  creator: { '@id': `${SITE.url}/#organization` },
+  isAccessibleForFree: true,
+  inLanguage: 'en',
+  keywords: ['cyclades', 'greece', 'bus', 'timetable', 'gtfs', 'ktel', 'open data'],
+  dateModified,
+  isBasedOn: ISLANDS.map((island) => island.operator.site),
+  variableMeasured: [
+    'stops',
+    'routes',
+    'scheduled departures',
+    'curated fares',
+  ],
+  distribution: ISLANDS.flatMap((island) => [
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/zip',
+      contentUrl: `${SITE.url}/${island.subdomain}/gtfs/${island.id}go-gtfs.zip`,
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: `${SITE.url}/${island.subdomain}/data/routes.json`,
+    },
+  ]),
+};
+---
+
+<BaseLayout
+  title={t('data.title')}
+  description="Where every CycladesGo timetable, stop coordinate and fare comes from, with the operator, the source URL, the snapshot date and the date we verified it for each island."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[organizationNode(), breadcrumbNode([{ name: 'Home', path: '/' }, { name: 'Our data', path }]), networkDataset]}
+>
+  <div class="mx-auto max-w-4xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('data.title')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('data.title')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      {t('data.lede')}
+    </p>
+
+    <TrustBanner locale={locale} class="mt-6 max-w-3xl" />
+
+    <p class="prose-measure mt-6 leading-relaxed text-[var(--color-ink-soft)]">
+      There are four pages in this section, and they exist because a bus timetable without a source
+      and a date is just a rumour with a nice font. Read them in this order: the methodology tells
+      you where the numbers came from, the known-limits page tells you where they stop being
+      reliable, the changelog tells you what has gone wrong, and the open-data page tells you how to
+      take the result and build something with it.
+    </p>
+
+    <section aria-labelledby="data-start" class="mt-12">
+      <SectionHeading id="data-start">Start here</SectionHeading>
+      <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+        {
+          cards.map((card) => (
+            <li>
+              <Card as="article" class="flex h-full flex-col">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-aegean-bg)] text-[var(--color-aegean-deep)]">
+                  <Icon name={card.icon} size={20} />
+                </span>
+                <h3 class="mt-4 text-lg font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+                  <a href={localeUrl(locale, card.href)} class="no-underline hover:underline">
+                    {card.title}
+                  </a>
+                </h3>
+                <p class="mt-2 flex-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+                  {card.body}
+                </p>
+                <a
+                  href={localeUrl(locale, card.href)}
+                  class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
+                >
+                  {card.linkLabel}
+                  <Icon name="arrow-right" size={14} />
+                </a>
+              </Card>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="provenance" class="mt-14">
+      <SectionHeading id="provenance">Provenance, island by island</SectionHeading>
+      <p class="prose-measure mt-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        Every published network, the operator that runs it, the page we read, the day we read it and
+        the day we are willing to stand behind it. The last column is not a soft target. When that
+        date passes, the build fails rather than publishing a schedule from last August.
+      </p>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full min-w-[52rem] border-collapse text-left text-sm">
+          <caption class="sr-only">
+            Provenance per island: operator, source page, snapshot date and the date the data is
+            verified until
+          </caption>
+          <thead>
+            <tr class="border-b border-[var(--color-border)] text-xs uppercase tracking-wide text-[var(--color-muted)]">
+              <th scope="col" class="py-2.5 pr-4 font-semibold">Island</th>
+              <th scope="col" class="py-2.5 pr-4 font-semibold">Operator</th>
+              <th scope="col" class="py-2.5 pr-4 font-semibold">Source page</th>
+              <th scope="col" class="py-2.5 pr-4 font-semibold">Snapshot</th>
+              <th scope="col" class="py-2.5 font-semibold">Verified until</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              ISLANDS.map((island) => (
+                <tr class="border-b border-[var(--color-border)] align-top">
+                  <th scope="row" class="py-3 pr-4 font-semibold text-[var(--color-ink)]">
+                    {island.name}{' '}
+                    <span lang="el" class="text-xs font-normal text-[var(--color-muted)]">
+                      {island.nameEl}
+                    </span>
+                  </th>
+                  <td class="py-3 pr-4 text-[var(--color-ink-soft)]">{island.operator.name}</td>
+                  <td class="py-3 pr-4">
+                    <a
+                      href={island.operator.site}
+                      rel="nofollow noopener"
+                      target="_blank"
+                      class="break-all text-[var(--color-aegean)] underline underline-offset-2"
+                    >
+                      {island.operator.site.replace(/^https?:\/\//, '')}
+                    </a>
+                  </td>
+                  <td class="tabular py-3 text-[var(--color-ink-soft)]">
+                    {island.dataGeneratedAt ?? 'not synced'}
+                  </td>
+                  <td class="tabular py-3 text-[var(--color-ink-soft)]">
+                    {island.dataValidTo ?? 'not stated'}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-4 text-xs leading-relaxed text-[var(--color-muted)]">
+        Times come from the operator. Coordinates, road geometry and place names come from
+        OpenStreetMap, which is licensed ODbL 1.0. Fares are curated by hand and checked monthly. The
+        source page is linked from every operator name on this site so you can compare our figure with
+        theirs in one click. If the two disagree, theirs is the authority and
+        <a href={localeUrl(locale, '/report')} class="underline underline-offset-2">we want to know</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="why" class="mt-14">
+      <SectionHeading id="why">Why we publish all of this</SectionHeading>
+      <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <p>
+          Three reasons, in order of weight. First, correctness: a bus timetable is only useful if you
+          know how old it is, and a page that hides its age is a page that has decided to be
+          reassuring rather than helpful. Second, scrutiny: we are a small project making claims about
+          services run by other people, and the only fair way to ask to be believed is to publish the
+          inputs. Third, reuse: the operator's timetable is a public document and the coordinates are
+          open data, so the combined product should be available to anyone who wants to build a
+          better version of what we built.
+        </p>
+        <p>
+          There is a fourth reason, which is that we have been wrong before and got it wrong in ways
+          that mattered. You cannot ask a site to be accountable for something it has not written
+          down. Everything we have broken is in the
+          <a href={localeUrl(locale, '/data/changelog')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+            changelog</a>, with the date it happened and what we changed.
+        </p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

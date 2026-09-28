@@ -1,0 +1,16 @@
+---
+interface Props {
+  as?: 'h1' | 'h2' | 'h3' | 'h4';
+  id?: string;
+  class?: string;
+}
+const { as: Tag = 'h2', id, class: className = '' } = Astro.props;
+---
+
+<Tag
+  id={id}
+  class={`font-semibold tracking-tight text-[var(--color-ink)] ${Tag === 'h1' ? 'text-3xl sm:text-4xl' : Tag === 'h2' ? 'text-xl sm:text-2xl' : 'text-lg'} ${className}`}
+  style="letter-spacing: -0.02em;"
+>
+  <slot />
+</Tag>

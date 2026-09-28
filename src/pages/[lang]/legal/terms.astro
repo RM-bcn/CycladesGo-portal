@@ -1,0 +1,247 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalLayout from '../../../layouts/LegalLayout.astro';
+import { SITE } from '../../../data/site';
+import { LOCALES } from '../../../i18n/utils';
+import { resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const dateModified = '2026-09-28';
+
+const scope = [
+  {
+    included: 'Route, stop and timetable information',
+    detail:
+      'Which lines exist, which stops they serve, where those stops are mapped, and the times the operator has published. Every time carries the date it was retrieved and the date it is verified until.',
+  },
+  {
+    included: 'Curated fare information',
+    detail:
+      'The fare the operator publishes, checked by hand and reconciled monthly. It is information, not a quoted price, and it is not a contractual offer to supply a journey at that price.',
+  },
+  {
+    included: 'Journey planning between scheduled services',
+    detail:
+      'Combining published services and walking legs to suggest a route. The result is a suggestion built on a schedule, not a reservation and not a commitment.',
+  },
+];
+
+const excluded = [
+  {
+    excluded: 'Live vehicle positions',
+    detail:
+      'There is no vehicle feed, no arrivals, no departures board, and no way to tell you where a bus is or whether it is running. We will not scrape one.',
+  },
+  {
+    excluded: 'Disruption alerts',
+    detail:
+      'Cancellations, diversions, delays, strikes, road closures and event-related changes are not published, are not monitored, and will not be announced by this site.',
+  },
+  {
+    excluded: 'Ticket availability',
+    detail:
+      'We do not know whether a bus has room, whether seats are reserved, or whether a ticket exists. We sell nothing and hold no inventory.',
+  },
+  {
+    excluded: 'Boarding and accessibility information',
+    detail:
+      'Kerb heights, vehicle types, ramp or lift availability, wheelchair boarding, and the practical usability of a stop are not published. The stop position we publish is a mapped point, not a boarding instruction.',
+  },
+];
+---
+
+<LegalLayout
+  title="Terms of use"
+  description="CycladesGo is an information service, not a travel agency or ticket seller: what it covers, fares, liability under Greek law, licences and withdrawals."
+  locale={locale}
+  path="/legal/terms"
+  dateModified={dateModified}
+  icon="unofficial"
+>
+  <h2 class="text-lg font-semibold text-[var(--color-ink)]">1. What these terms are</h2>
+  <p>
+    These terms govern your use of this website and of the CycladesGo island planners. By using them
+    you accept them. If you do not accept them, please do not use the site; the service is free and
+    there is nothing to lose by not using it.
+  </p>
+  <p>
+    The English text is the authoritative version. Other language versions may lag behind it, and
+    where they conflict the English text governs.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">2. What CycladesGo is</h2>
+  <p>
+    CycladesGo is an editorial information service. We publish, free of charge, a readable
+    presentation of bus routes, published timetables and published fares for five Cyclades islands,
+    together with commentary about how those services work.
+  </p>
+  <p>
+    CycladesGo is not a travel agency, a tour operator, a passenger transport operator, a ticketing
+    system or a ticket sales office. We are not affiliated with, endorsed by, authorised by or
+    operated by KTEL Naxos, KTEL Paros, KTEL Cyclades, Milos Buses, Ios Local Buses or any ferry
+    company. We do not carry passengers, we do not sell tickets, and we take no commission on any
+    fare.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">3. What is inside the scope of the service</h2>
+  <ul class="space-y-3">
+    {
+      scope.map((item) => (
+        <li>
+          <p class="text-sm font-semibold text-[var(--color-ink)]">{item.included}</p>
+          <p class="mt-1 text-sm leading-relaxed">{item.detail}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">4. What is explicitly outside it</h2>
+  <p>
+    The following are not provided. They are not degraded versions of things we do provide; they are
+    not provided at all, and nothing on this site should be read as implying otherwise.
+  </p>
+  <ul class="space-y-3">
+    {
+      excluded.map((item) => (
+        <li>
+          <p class="text-sm font-semibold text-[var(--color-ink)]">{item.excluded}</p>
+          <p class="mt-1 text-sm leading-relaxed">{item.detail}</p>
+        </li>
+      ))
+    }
+  </ul>
+  <p>
+    Where a page is silent on something, that silence is a scope limit and not an omission you may
+    rely on. Ask us and we will say whether it is in scope.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">5. Prices and contractual prices</h2>
+  <p>
+    Bus fares on these islands are set by the operators. Any fare shown on this site is published as
+    information, taken from the operator's own published fare, and dated. It is not a quotation, not
+    an offer, and not a contractual price within the meaning of the Consumer Rights Directive
+    2011/83/EU.
+  </p>
+  <p>
+    No contract is concluded when you read a fare here. The price you pay is the price the driver
+    charges you, in cash, at the moment you board, and that is the only price that binds anybody. If
+    the fare on the vehicle differs from the fare here, the fare on the vehicle is the fare, and we
+    would like to know so that we can correct our page.
+  </p>
+  <p>
+    Nothing on this site creates a contract of carriage, a contract for the provision of a service, or
+    any obligation to provide a journey. The bus you board is a contract with the operator, on the
+    operator's terms.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">6. Availability of the service</h2>
+  <p>
+    The free parts of this service are provided as they are. We may change, suspend, or withdraw any
+    part of the service at any time and without notice, including a whole island planner, an entire
+    dataset, or the site itself.
+  </p>
+  <p>
+    In particular, when an island dataset passes the date after which we are willing to publish it,
+    the build fails and that island is withdrawn. This is intentional: an empty planner is more
+    useful than a stale one. It has happened, and it is written up in the
+    <a class="underline" href="/data/changelog">changelog</a>.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">7. Liability</h2>
+  <p>
+    This site is published under Greek law, and the following is our position under it, to the extent
+    that the law permits such a position to be taken.
+  </p>
+  <p>
+    We accept no liability for indirect or consequential loss, and for loss of profit, revenue,
+    opportunity, holiday, transport or accommodation. We are not liable for the consequences of
+    relying on a published schedule that was wrong, incomplete or out of date.
+  </p>
+  <p>
+    Our total liability for any claim arising out of or in connection with the free parts of this
+    service is limited to intent and gross negligence, and to the extent permitted by law. Liability
+    for slight fault is excluded. We are not liable for the acts or omissions of any bus operator,
+    ferry company or third party, and nothing in these terms excludes liability that cannot lawfully
+    be excluded.
+  </p>
+  <p>
+    So that the practical reality is clear: this is an unpaid, free information service, there is no
+    contract of carriage with us, and the worst realistic outcome of a claim is a modest damages
+    award. Greek law has no punitive damages regime, so there is no multiple of a defendant's gain
+    to fear. If you are considering a claim that is larger than that, the commercial reality is that
+    there is no fund here to satisfy it.
+  </p>
+  <p>
+    Nothing in these terms limits our liability for fraud, for anything else that cannot lawfully be
+    limited, or for death or personal injury caused by our negligence.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">8. Licence of the data</h2>
+  <p>
+    The curation work we do — selecting and normalising operator timetables, structuring routes,
+    transcribing and curating fares, matching stops to coordinates, and writing the adapters and
+    pipeline — is licensed under the Creative Commons Attribution 4.0 International licence
+    (CC-BY 4.0). You may reuse and adapt it, including commercially, provided you attribute
+    CycladesGo, link to the
+    <a class="underline" href="/data">data page</a>, and indicate whether you made changes.
+  </p>
+  <p>
+    Stop coordinates, road geometry, route shapes and place names are derived from OpenStreetMap
+    and are licensed under the Open Database License 1.0. ODbL is a copyleft licence: if you use a
+    derived database or a substantial part of one, you must make your own database available under
+    ODbL, and you must keep the attribution to OpenStreetMap contributors. That obligation applies
+    to those parts and is not removed by the CC-BY terms above.
+  </p>
+  <p>
+    Map data © OpenStreetMap contributors, available under the ODbL. The full statement, including
+    the download URLs, is on the <a class="underline" href="/data/open-data">open data</a> page.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">9. Licence of the code</h2>
+  <p>
+    The source code of this site and of every island planner is open source and is published at
+    <a class="underline" href={SITE.repo} rel="noopener">{SITE.repo}</a>. It is released under a
+    standard permissive MIT licence, which permits reuse, modification, redistribution and commercial
+    use, including running your own copy.
+  </p>
+  <p>
+    <span
+      class="rounded-[var(--radius-sm)] bg-[var(--color-sun-bg)] px-1.5 py-0.5 font-semibold text-[var(--color-sun-ink)]"
+      >TODO before launch</span
+    >: a LICENSE file must be committed to the repository and must match this paragraph. Until it
+    exists, this statement is a statement of intent rather than a grant, and the repository
+    description is the thing to rely on. It is called out here rather than left to be discovered.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">10. Sponsorship and advertising</h2>
+  <p>
+    CycladesGo is a commercial project funded by sponsorship and donations. Sponsorship buys
+    advertising placement and nothing else: it has never bought and will never buy a data correction,
+    a route being added or removed, a change to a known-limits page, or a word in an editorial
+    article. Sponsored content is identified as such and is kept in its own container, separate from
+    editorial text. The full rules are in the
+    <a class="underline" href="/sponsors">sponsorship policy</a>.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">11. Third-party names</h2>
+  <p>
+    Bus operators, ferry companies and other businesses are named on this site solely to identify
+    who actually runs a service, and always next to a link to that party's own site. Their names
+    remain their property. We reproduce no operator logo, wordmark graphic or timetable artwork, and
+    the mention of a name here is not a statement about that party's products.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">12. Changes to these terms</h2>
+  <p>
+    We may revise these terms. The date at the top of this page shows when they were last changed,
+    and the revised version applies from that moment. Continuing to use the service after that
+    constitutes acceptance.
+  </p>
+
+  <p class="border-t border-[var(--color-border)] pt-4 text-sm">
+    <span class="tabular">Date last updated: {dateModified}</span>. Questions about these terms:
+    <a class="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+  </p>
+</LegalLayout>

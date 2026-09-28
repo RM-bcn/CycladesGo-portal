@@ -1,0 +1,267 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import { ISLANDS } from '../../../data/islands';
+import OperatorAttribution from '../../../components/OperatorAttribution.astro';
+import { SITE } from '../../../data/site';
+import { ORGANIZATION_ID, MAINTAINER_ID } from '../../../lib/jsonld';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/data/methodology';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+---
+
+<BaseLayout
+  title="How we get our data"
+  description="Where each CycladesGo timetable comes from, the OpenStreetMap coordinates, hand-checked fares, the quality gates, and where the pipeline goes wrong."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    {
+      '@type': 'TechArticle',
+      headline: 'How we get our data',
+      description:
+        'The full CycladesGo ingestion pipeline: official operator timetables, OpenStreetMap coordinates, hand-verified fares, and the quality gates that stop a bad dataset from shipping.',
+      datePublished: '2026-01-20',
+      dateModified,
+      inLanguage: 'en',
+      isAccessibleForFree: true,
+      author: { '@id': MAINTAINER_ID },
+      publisher: { '@id': ORGANIZATION_ID },
+      mainEntityOfPage: { '@id': new URL(localeUrl(locale, path), `${SITE.url}/`).href },
+    },
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'Our data', path: '/data' },
+      { name: 'Methodology', path: '/data/methodology' },
+    ]),
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <a href={localeUrl(locale, '/data')} class="no-underline hover:underline">Our data</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">Methodology</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      How we get our data
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      Last updated: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      CycladesGo is an independent, commercial project. It is not affiliated with, endorsed by or
+      operated by any KTEL or bus operator, and it is not a ticket sales office. This page explains
+      exactly where every number on this site comes from, how we transform it, and where we are
+      known to be wrong.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The short answer
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Departure times come from the island's own bus operator. Stop coordinates come from
+      OpenStreetMap. Fares are checked by hand against what the operator publishes. There is
+      no real-time vehicle feed, and there will not be one — see{' '}
+      <a href={localeUrl(locale, '/data/quality')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+        known limits
+      </a>.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Where each part comes from
+    </h2>
+
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full min-w-[42rem] border-collapse text-left text-sm">
+        <caption class="sr-only">
+          Data sources per island, with the operator, the source page and the snapshot date
+        </caption>
+        <thead>
+          <tr class="border-b border-[var(--color-border)] text-xs uppercase tracking-wide text-[var(--color-muted)]">
+            <th scope="col" class="py-2.5 pr-4 font-semibold">Island</th>
+            <th scope="col" class="py-2.5 pr-4 font-semibold">Operator</th>
+            <th scope="col" class="py-2.5 pr-4 font-semibold">Official source</th>
+            <th scope="col" class="py-2.5 pr-4 font-semibold">Coordinates</th>
+            <th scope="col" class="py-2.5 font-semibold">Snapshot</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ISLANDS.map((island) => (
+              <tr class="border-b border-[var(--color-border)] align-top">
+                <th scope="row" class="py-3 pr-4 font-semibold text-[var(--color-ink)]">
+                  {island.name}
+                </th>
+                <td class="py-3 pr-4 text-[var(--color-ink-soft)]">
+                  {island.operator.name}
+                  {island.operator.nameEl && (
+                    <span lang="el" class="block text-xs text-[var(--color-muted)]">
+                      {island.operator.nameEl}
+                    </span>
+                  )}
+                </td>
+                <td class="py-3 pr-4">
+                  <a
+                    href={island.operator.site}
+                    rel="nofollow noopener"
+                    target="_blank"
+                    class="break-all text-[var(--color-aegean)] underline underline-offset-2"
+                  >
+                    {island.operator.site.replace(/^https?:\/\//, '')}
+                  </a>
+                </td>
+                <td class="py-3 pr-4 text-[var(--color-ink-soft)]">
+                  OpenStreetMap <span class="text-xs text-[var(--color-muted)]">(ODbL)</span>
+                </td>
+                <td class="tabular py-3 text-[var(--color-ink-soft)]">{island.dataGeneratedAt ?? '—'}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <ul class="mt-6 space-y-2">
+      {
+        ISLANDS.map((island) => (
+          <li>
+            <OperatorAttribution
+              island={island}
+              retrieved={island.dataGeneratedAt ?? 'unknown'}
+              validTo={island.dataValidTo}
+            />
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-4 text-xs leading-relaxed text-[var(--color-muted)]">
+      We take departure times and fares from the operator. We take coordinates, road geometry and
+      place names from OpenStreetMap, which is licensed ODbL 1.0 — that is why every island app
+      carries the “© OpenStreetMap contributors” attribution. We do not copy an operator's page
+      layout, styling or timetable artwork; we publish the facts in our own presentation.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The pipeline, step by step
+    </h2>
+    <ol class="mt-5 space-y-3">
+      {
+        [
+          ['Fetch', 'A per-operator adapter reads one class of operator website and produces a normalised shape. Each Cyclades operator uses a different CMS, so each has its own adapter plus a committed fixture it is tested against.'],
+          ['Extract', 'Departures, destinations, stop names and the operator’s own corridor labels come out as structured records, with the source URL and a content hash attached.'],
+          ['Place', 'Stop names are matched to OpenStreetMap within a distance bound. A name match alone is never enough — duplicate place names collide, and a wrong coordinate sends a traveller to the wrong village.'],
+          ['Interpolate', 'If the operator publishes only a departure and an arrival time, the intermediate stop times are distributed along the road geometry. Every interpolated value is flagged as an estimate in the data and in the UI.'],
+          ['Validate', 'The dataset is checked against a schema, then audited for duplicate coordinates, noise stops and destinations we cannot map. Unmapped destinations are recorded as a gap rather than silently dropped.'],
+          ['Publish', 'The dataset is committed to Git. The Vercel build never touches the network. If the dataset’s validity window has passed, the build fails rather than shipping a stale schedule.'],
+        ].map(([title, body], index) => (
+          <li class="flex gap-4">
+            <span class="tabular mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-aegean-bg)] text-xs font-semibold text-[var(--color-aegean-deep)]">
+              {index + 1}
+            </span>
+            <div>
+              <p class="font-semibold text-[var(--color-ink)]">{title}</p>
+              <p class="prose-measure mt-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      What “interpolated” means, precisely
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Suppose an operator prints one bus leaving Naxos Town at 07:00 and reaching Apollon at 07:55,
+      with twelve stops in between and no times for them. We distribute those 55 minutes across the
+      stops in proportion to road distance. Departures from the hub and from named villages are
+      therefore exact; the village-to-village times in the middle are estimates and can be off by up
+      to a few minutes on a steep road or in August traffic. Anything interpolated is labelled as such.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The validity window, and why we would rather go offline
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Every dataset carries a date after which it is no longer trustworthy. When that date passes,
+      the build fails. This is uncomfortable and it is deliberate: a holidaymaker acting on a timetable
+      from last August is worse off than one who sees nothing at all. It is also a promise we can
+      keep automatically rather than by remembering.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Where we have been wrong
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Twice, in ways worth writing down. On Paros, stop names were matched to OpenStreetMap by name
+      alone, which produced a wrong coordinate for two stops; the fix was distance-bounded matching.
+      Then a single new destination label on Naxos — “AIRPORT (300meters)” — stalled a publish for
+      days and left the island on an expired timetable; the fix was recording unmapped destinations
+      as gaps and publishing the rest. Both are documented in the changelog. If you find a third,
+      <a href={localeUrl(locale, '/report')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+        tell us
+      </a>.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      What we deliberately do not do
+    </h2>
+    <ul class="prose-measure mt-4 space-y-2.5">
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          We do not upload or register our GTFS with Google Maps, Apple Maps, Moovit, Transit
+          App or any other aggregator. Being a transit data provider carries accuracy and liability
+          obligations we are not equipped to carry. The data stays ours to serve; you are welcome to
+          download it.
+        </span>
+      </li>
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          We do not sell, book or issue bus tickets, and we take no commission on fares.
+        </span>
+      </li>
+      <li class="flex gap-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+        <span>
+          We do not run advertising trackers, and we do not sell or share visitor data. Sponsorship
+          buys visibility and nothing else.
+        </span>
+      </li>
+    </ul>
+
+    <div class="mt-14 flex flex-wrap gap-3">
+      <a
+        href={localeUrl(locale, '/data/quality')}
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline hover:bg-[var(--color-aegean-btn-hover)]"
+      >
+        {t('data.quality')}
+        <Icon name="arrow-right" size={16} />
+      </a>
+      <a
+        href={localeUrl(locale, '/data/changelog')}
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 text-sm font-semibold text-[var(--color-ink-soft)] no-underline hover:bg-[var(--color-surface-2)]"
+      >
+        {t('data.changelog')}
+      </a>
+    </div>
+  </div>
+</BaseLayout>

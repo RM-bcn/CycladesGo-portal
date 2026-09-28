@@ -1,0 +1,95 @@
+CycladesGo portal — third-party notices
+
+This project bundles or depends on the following third-party components. Each
+remains under its own license; this notice does not change those terms. Nothing
+here relicenses anything.
+
+Runtime and build dependencies
+  - Astro — MIT
+  - @astrojs/sitemap — MIT
+  - @astrojs/check — MIT
+  - Tailwind CSS, @tailwindcss/vite — MIT
+  - Vite — MIT
+  - tsx — MIT
+  - Vitest — MIT
+  - sharp — Apache-2.0
+  - TypeScript — Apache-2.0
+
+Fonts
+  - IBM Plex Sans Variable, via @fontsource-variable/ibm-plex-sans — SIL Open
+    Font License 1.1
+  - IBM Plex Mono, via @fontsource/ibm-plex-mono — SIL Open Font License 1.1
+  Both are self-hosted from the Fontsource packages; no font CDN is contacted at
+  run time. The OFL permits use in a commercial product and permits embedding,
+  which is what we do. It does not permit selling the fonts on their own, which
+  is not what we do.
+
+Data
+  - OpenStreetMap contributors — ODbL 1.0
+      Stop coordinates, road geometry, route shapes and place names in the
+      island datasets come from OpenStreetMap contributors and are licensed
+      under the Open Database License 1.0.
+
+      In plain English, because the obligation is easy to miss: ODbL is
+      copyleft. If you take a derived database, or a substantial part of one,
+      you must make your own database available under ODbL, and you must keep
+      the attribution to OpenStreetMap contributors. We publish our derived
+      database anyway, and we publish it with the attribution attached, because
+      the alternative is not publishing it at all. We do not redistribute
+      OpenStreetMap data under a more permissive licence, and the CC-BY terms
+      described below do not override the ODbL for the parts derived from it.
+
+  - Our own curation of the timetable data — CC-BY 4.0
+      The selection, arrangement, verification, interpolation and presentation
+      of the operator's published schedules, together with the curated fares,
+      are ours and are offered under Creative Commons Attribution 4.0. The
+      underlying facts are the operators'.
+
+  - Operator schedules, stop order, route numbers and fares — factual data from
+      each operator's own published material: KTEL Naxos (naxosbuses.com),
+      KTEL Paros (ktelparou.gr), KTEL Santorini (ktel-santorini.gr), Milos
+      Buses (milosbuses.com) and Ios Local Buses (ktel-ios.gr).
+
+      Those schedules are used as factual data only, in our own presentation.
+      No operator's timetable artwork, grid layout, table styling, route-map
+      graphic or logo is reproduced on this site, and no operator's name is
+      rendered as a logo. Operator names are plain text, used solely to say who
+      runs each service.
+
+      The operators have not licensed their material to us, and we have not
+      asked them to. That is a deliberate position, recorded in
+      docs/legal.md §5, and it is also why the operator relationship, not a
+      licence, is the route to de-risking this exposure.
+
+Design system
+  - The design tokens in src/styles/global.css are a verbatim port of the
+    Cycladic Sun (light) and Aegean Night v2 (dark) tokens in the CycladesGo
+    engine repository, RM-bcn/Naxos-bus-pwa, at
+    src/styles/global.css. They are duplicated rather than shared because the
+    portal is a separate deployable that cannot import from the engine.
+
+    The provenance of the ported values is therefore the provenance of that
+    file. The engine repository is not MIT-licensed: it carries a proprietary
+    all-rights-reserved licence for its source code. This notice records that
+    the token values were taken from it. Whether that is permitted is a
+    question for the copyright holder of the engine repository, not one this
+    file settles, and it is recorded here rather than left implicit.
+
+    Two tokens are also written down as literals in src/data/site.ts, and the
+    favicon, the 512px logo, the app icons and the Open Graph image are rendered
+    from a single SVG source in scripts/generate-assets.ts.
+
+Affiliation
+  CycladesGo is an independent commercial project.
+
+  It is not affiliated with, endorsed by, authorised by, sponsored by or
+  operated by KTEL Naxos, KTEL Paros, KTEL Cyclades, KTEL Santorini, Milos
+  Buses, Ios Local Buses, Cyclades Fast Ferries, or any other bus, coach or
+  ferry operator, and it is not a ticket sales office.
+
+  Operator names appear on this site solely to identify who runs each service.
+  We sell no tickets, take no commission on any fare, and receive nothing for a
+  correction to the data.
+
+  Departure times are operators' published schedules. There is no real-time
+  vehicle feed for this or any CycladesGo app, and none is implied.

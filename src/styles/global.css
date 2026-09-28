@@ -1,0 +1,324 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/ibm-plex-sans/index.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/*
+ * CycladesGo portal — design tokens.
+ *
+ * These are the SAME tokens as the island PWAs (`Naxos-bus-pwa/src/styles/global.css`,
+ * "Cycladic Sun" light / "Aegean Night v2" dark). They are duplicated rather
+ * than shared so the portal can be designed and reviewed in isolation, but
+ * they must stay byte-identical in value. The palette gate in
+ * `scripts/audit-seo.ts` (check 11) fails the build when a hex leaves the
+ * palette, with its allowlist harvested from this file and `src/data/site.ts`.
+ *
+ * Portal-specific additions are namespaced `--cg-*` and must never redefine an
+ * engine token.
+ */
+
+@theme static {
+  --font-sans: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Cycladic Sun — sunlit plaster, warm neutrals, cool shadow edges */
+  --color-bg: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EEF2F6;
+  --color-border: #D9E2E9;
+
+  --color-ink: #0D2B4A;
+  --color-ink-soft: #46617D;
+  --color-muted: #55697D;
+
+  --color-aegean: #1268B3;
+  --color-aegean-deep: #0E5594;
+  --color-aegean-active: #0B4477;
+  --color-aegean-bg: #E8F1F9;
+
+  --color-kyano: #2E9BD6;
+
+  --color-sea: #0E8A8F;
+  --color-sea-bg: #E4F2F2;
+
+  --color-bougainvillea: #B0356F;
+  --color-bougainvillea-bg: #F7E8EF;
+
+  --color-sun: #E8A33C;
+  --color-sun-ink: #8A5B12;
+  --color-sun-bg: #FBF3E2;
+
+  --color-terracotta: #A8441F;
+  --color-terracotta-bg: #F9EAE4;
+
+  --color-olive: #4C7A34;
+  --color-olive-bg: #E9F2E3;
+
+  --color-line-1: #1268B3;
+  --color-line-10: #1568A8;
+  --color-line-2: #B4502E;
+  --color-line-3: #96650F;
+  --color-line-4: #6B4E9B;
+  --color-line-5: #4C7A34;
+
+  --shadow-cube: 0 1px 1px rgba(20,48,77,.10), 0 3px 10px rgba(20,48,77,.07);
+  --shadow-lift: 0 2px 4px rgba(20,48,77,.12), 0 12px 32px rgba(20,48,77,.10);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+:root {
+  color-scheme: light;
+  --brand: var(--color-aegean);
+  --brand-dark: var(--color-aegean-deep);
+  --surface: var(--color-surface);
+  --muted: var(--color-muted);
+  --border: var(--color-border);
+  --color-aegean-btn-text: #ffffff;
+  --color-aegean-btn-hover: var(--color-aegean-deep);
+}
+
+/* Aegean Night v2 — desaturated blue-charcoal stone, warm moonlit text */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --brand: var(--color-aegean);
+  --brand-dark: var(--color-aegean-deep);
+  --surface: var(--color-surface);
+  --muted: var(--color-muted);
+  --border: var(--color-border);
+  --color-bg: #101B24;
+  --color-surface: #182632;
+  --color-surface-2: #20303D;
+  --color-border: #334655;
+  --color-ink: #F1EDE4;
+  --color-ink-soft: #C4CCD1;
+  --color-muted: #8E99A2;
+  --color-aegean: #5FA8E0;
+  --color-aegean-deep: #7CB9EA;
+  --color-aegean-active: #4A96D0;
+  --color-aegean-bg: rgba(95,168,224,.16);
+  --color-aegean-btn: #5FA8E0;
+  --color-aegean-btn-text: #0B151D;
+  --color-aegean-btn-hover: #7CB9EA;
+  --color-kyano: #7CC4EE;
+  --color-sea: #4FB3B3;
+  --color-sea-bg: rgba(79,179,179,.14);
+  --color-bougainvillea: #D678A6;
+  --color-bougainvillea-bg: rgba(214,120,166,.14);
+  --color-sun: #F2C069;
+  --color-sun-ink: #E2B369;
+  --color-sun-bg: rgba(242,192,105,.16);
+  --color-candle: #F2C069;
+  --color-candle-bg: rgba(242,192,105,.16);
+  --glow-candle: 0 0 22px rgba(242,192,105,.14);
+  --color-terracotta: #DE8A6C;
+  --color-terracotta-bg: rgba(222,138,108,.16);
+  --color-olive: #96C46E;
+  --color-olive-bg: rgba(150,196,110,.16);
+  --color-line-1: #5FA8E0;
+  --color-line-10: #6FC0E8;
+  --color-line-2: #DE8A6C;
+  --color-line-3: #E2B369;
+  --color-line-4: #B49BE0;
+  --color-line-5: #96C46E;
+  --shadow-cube: 0 1px 2px rgba(0,0,0,.45), 0 6px 20px rgba(0,0,0,.35);
+  --shadow-lift: 0 2px 6px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45),
+                 0 0 0 1px rgba(242,192,105,.08);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Plaster grain texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+:root[data-theme='dark'] body::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+}
+
+/* Dark moonlight glow */
+:root[data-theme='dark'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(1200px 400px at 50% -10%, rgba(241,237,228,.05), transparent 70%);
+}
+
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* WCAG 2.2 AA — visible focus everywhere, never removed */
+:focus-visible {
+  outline: 3px solid var(--color-aegean);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+:where(a, button):focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip link — first tab stop on every page */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10000;
+  background: var(--color-aegean);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* Editorial measure */
+.prose-measure {
+  max-width: 68ch;
+}
+
+/*
+ * No global `a` rule on purpose. A bare element selector would be overridden by
+ * most utility classes, but not by a button's own text colour, and that
+ * regression (aegean link text on an aegean background) is invisible until
+ * somebody screenshots the page. Link styling is scoped to `.doc` below and set
+ * explicitly on every navigation and CTA component.
+ */
+
+/*
+ * `.doc` styles the long-form content flow. Hand-rolled rather than pulled from
+ * a typography plugin because the legal pages are dense with <dl>, <table> and
+ * definition-list content that the usual presets do not cover, and because the
+ * palette gate only understands our own tokens.
+ */
+.doc {
+  color: var(--color-ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+.doc a {
+  color: var(--color-aegean);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.doc a:hover {
+  color: var(--color-aegean-deep);
+  text-decoration-thickness: 2px;
+}
+.doc h2 {
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.doc h3 {
+  color: var(--color-ink);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.375rem;
+}
+.doc p + p {
+  margin-top: 0.875rem;
+}
+.doc ul,
+.doc ol {
+  padding-left: 1.25rem;
+  margin-top: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.doc ul {
+  list-style: disc;
+}
+.doc ol {
+  list-style: decimal;
+}
+.doc li::marker {
+  color: var(--color-aegean);
+}
+.doc strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.doc code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.05em 0.35em;
+}
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+.doc th,
+.doc td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.doc thead th {
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.doc tbody th {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.doc hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: 2rem 0;
+}

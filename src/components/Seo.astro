@@ -1,0 +1,100 @@
+---
+import { SITE } from '../data/site';
+import { DEFAULT_LOCALE, localeUrl, type Locale } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  pathname: string;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+  /**
+   * Locales this page is actually published in. A page must never advertise a
+   * `hreflang` for a locale that does not exist — one dead member invalidates
+   * the whole cluster, which is why this is a required prop rather than
+   * "assume all locales".
+   */
+  hreflangLocales: Locale[];
+  noindex?: boolean;
+  /** ISO-8601 date. Emitted as `dateModified` and as OG `article:modified_time`. */
+  dateModified?: string;
+}
+
+const {
+  title,
+  description,
+  locale,
+  pathname,
+  jsonLd,
+  hreflangLocales,
+  noindex = false,
+  dateModified,
+} = Astro.props;
+
+const site = new URL(SITE.url);
+/**
+ * Self-referencing canonical, in every locale. The "canonical trick" — pointing
+ * all locales at one language — is explicitly wrong: it overrides the hreflang
+ * cluster we just built.
+ */
+const canonical = new URL(pathname, site).href;
+const pathOnHost = pathname.replace(/^\/(en|el|de|fr|it)(?=\/|$)/, '') || '/';
+const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
+const graph = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+
+/**
+ * A locale that has no reviewed translation must not be indexable and must not
+ * appear in any hreflang cluster. A non-reciprocal annotation invalidates the
+ * whole cluster, and publishing unreviewed machine translation under an
+ * `hreflang` tag is a promise we cannot keep — so the rule lives here, once,
+ * rather than in fifteen page files that can drift apart.
+ */
+const cluster = hreflangLocales.filter((alt) => alt !== locale);
+const translated = hreflangLocales.includes(locale);
+const clusterLocales = translated ? [...cluster, locale] : [];
+const indexable = !noindex && translated;
+const xDefault = new URL(localeUrl(DEFAULT_LOCALE, pathOnHost), site).href;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{!indexable && <meta name="robots" content="noindex, follow" />}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={locale} />
+<meta property="og:image" content={new URL('/og.png', site).href} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={new URL('/og.png', site).href} />
+{dateModified && <meta property="article:modified_time" content={dateModified} />}
+
+{
+  clusterLocales.map((alt) => (
+    <link
+      rel="alternate"
+      hreflang={alt}
+      href={new URL(localeUrl(alt, pathOnHost), site).href}
+    />
+  ))
+}
+{translated && <link rel="alternate" hreflang="x-default" href={xDefault} />}
+
+{
+  graph.length > 0 && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}
+    />
+  )
+}
+
+{/* No markdown alternate: no AI crawler consumes it, and claiming otherwise in
+    the head is a promise we cannot keep. See docs/seo.md §markdown. */}

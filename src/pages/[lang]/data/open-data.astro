@@ -1,0 +1,292 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import { ISLANDS } from '../../../data/islands';
+import { SITE } from '../../../data/site';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/data/open-data';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+const urlPatterns = [
+  {
+    what: 'GTFS archive',
+    pattern: 'https://{island}.cycladesgo.com/gtfs/{id}go-gtfs.zip',
+    note: 'Stops, routes, shapes, scheduled departures and calendar. Scheduled times only, no vehicle positions. There is no realtime.txt, and there will not be one.',
+  },
+  {
+    what: 'Routes and fares as JSON',
+    pattern: 'https://{island}.cycladesgo.com/data/routes.json',
+    note: 'The same network in a form that is trivial to read without a GTFS parser, with the curated fare per line.',
+  },
+  {
+    what: 'Dataset landing page',
+    pattern: 'https://{island}.cycladesgo.com/data/',
+    note: 'Provenance, snapshot date, validity date, licence and known limits for that island.',
+  },
+  {
+    what: 'Provenance table, network-wide',
+    pattern: 'https://cycladesgo.com/{locale}/data/',
+    note: 'Every island, its operator, the source page, the snapshot date and the date we verified it for.',
+  },
+  {
+    what: 'Changelog',
+    pattern: 'https://cycladesgo.com/{locale}/data/changelog/',
+    note: 'Every change to the published datasets, dated, including the incidents.',
+  },
+  {
+    what: 'Source code',
+    pattern: SITE.repo,
+    note: 'Portal, planners and build pipeline. Reuse it, fork it, run your own copy.',
+  },
+] as const;
+
+const openDataDataset = {
+  '@type': 'Dataset',
+  '@id': `${SITE.url}/data/open-data/#dataset`,
+  name: 'CycladesGo open transit data',
+  description:
+    'Scheduled bus timetables, stops, routes and curated fares for the published CycladesGo island networks, as GTFS and JSON. Scheduled times only, no vehicle positions. Intermediate stop times are interpolated. Curation under CC-BY 4.0; parts derived from OpenStreetMap under ODbL 1.0.',
+  url: `${SITE.url}${localeUrl(locale, path)}`,
+  license: 'https://creativecommons.org/licenses/by/4.0/',
+  creator: { '@id': `${SITE.url}/#organization` },
+  isAccessibleForFree: true,
+  inLanguage: 'en',
+  keywords: ['gtfs', 'transit', 'open data', 'cyclades', 'greece', 'timetable', 'odbl'],
+  dateModified,
+  isBasedOn: ['https://www.openstreetmap.org/copyright'],
+  distribution: [
+    ...ISLANDS.map((island) => ({
+      '@type': 'DataDownload',
+      encodingFormat: 'application/zip',
+      contentUrl: `${SITE.url}/${island.subdomain}/gtfs/${island.id}go-gtfs.zip`,
+    })),
+    ...ISLANDS.map((island) => ({
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: `${SITE.url}/${island.subdomain}/data/routes.json`,
+    })),
+  ],
+};
+---
+
+<BaseLayout
+  title="Open data, licences and the URLs"
+  description="Download the CycladesGo island timetables as GTFS or JSON from stable per-island URLs. CC-BY 4.0 for the curation, ODbL 1.0 for the map parts. No live feed."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'Our data', path: '/data' },
+      { name: 'Open data', path },
+    ]),
+    openDataDataset,
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <a href={localeUrl(locale, '/data')} class="no-underline hover:underline">{t('data.title')}</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('data.licence')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('data.licence')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      The timetables an operator publishes are public documents, and the coordinates we use are open
+      data. The result of combining them is a public document too, so it is downloadable, in a
+      standard format, at a URL that will not move out from under you.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Two formats, at stable URLs
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      Each island has a GTFS archive, which is the interchange format any transit software can read,
+      and a JSON file of routes and fares, which is easier if you are writing something small. Both
+      are built with the dataset and served from the same deploy as the planner, so the URL stays
+      the same from one season to the next.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      What is not in either of them is the thing people usually want. There are no vehicle positions,
+      no arrivals, no delays and no cancellations, because the operators do not publish a feed and we
+      will not scrape one. See
+      <a href={localeUrl(locale, '/data/quality')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+        known limits</a> if you have not read that yet.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The URLs
+    </h2>
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full min-w-[46rem] border-collapse text-left text-sm">
+        <caption class="sr-only">
+          Stable URL patterns for the CycladesGo open data, per island and network-wide
+        </caption>
+        <thead>
+          <tr class="border-b border-[var(--color-border)] text-xs uppercase tracking-wide text-[var(--color-muted)]">
+            <th scope="col" class="py-2.5 pr-4 font-semibold">What</th>
+            <th scope="col" class="py-2.5 pr-4 font-semibold">Pattern</th>
+            <th scope="col" class="py-2.5 font-semibold">Contains</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            urlPatterns.map((row) => (
+              <tr class="border-b border-[var(--color-border)] align-top">
+                <th scope="row" class="py-3 pr-4 font-semibold text-[var(--color-ink)]">
+                  {row.what}
+                </th>
+                <td class="py-3 pr-4">
+                  <code class="tabular break-all text-xs text-[var(--color-aegean-deep)]">
+                    {row.pattern}
+                  </code>
+                </td>
+                <td class="py-3 text-[var(--color-ink-soft)]">{row.note}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-xs leading-relaxed text-[var(--color-muted)]">
+      Substituting <code class="tabular">&#123;island&#125;</code> and
+      <code class="tabular">&#123;id&#125;</code> with a value from the
+      <a href={localeUrl(locale, '/islands')} class="underline underline-offset-2">islands list</a>:
+      naxos, paros, santorini, milos, ios. The domain is not purchased yet; until it is, the same
+      files are served from each island's current host, and the pattern above is the one that will
+      hold.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The licence, and the part with a condition attached
+    </h2>
+    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)]">
+        <h3 class="flex items-center gap-2 text-base font-semibold text-[var(--color-ink)]">
+          <Icon name="download" size={16} class="shrink-0 text-[var(--color-aegean)]" />
+          Our curation: CC-BY 4.0
+        </h3>
+        <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+          The work we did — selecting and normalising the timetables, structuring the routes,
+          transcribing and curating the fares, matching stops to coordinates, writing the adapters
+          and the pipeline — is ours, and it is licensed under Creative Commons Attribution 4.0
+          International. You may copy, adapt and redistribute it commercially, including in a
+          closed product. The only condition is attribution: name CycladesGo, link to
+          <a href={localeUrl(locale, '/data')} class="underline underline-offset-2">the data page</a>,
+          and say if you made changes.
+        </p>
+      </div>
+      <div class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)]">
+        <h3 class="flex items-center gap-2 text-base font-semibold text-[var(--color-ink)]">
+          <Icon name="globe" size={16} class="shrink-0 text-[var(--color-olive)]" />
+          Derived from OpenStreetMap: ODbL 1.0
+        </h3>
+        <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+          Stop coordinates, road geometry, route shapes and place names come from OpenStreetMap
+          contributors and are licensed under the Open Database License 1.0. ODbL is a copyleft
+          licence, and the obligation comes with it: if you use a derived database or a substantial
+          part of one, you must release your own database under ODbL, and you must keep the
+          attribution to OpenStreetMap contributors. The CC-BY terms above do not override that for
+          those parts. In practice it means an adapted dataset built from ours inherits the
+          ShareAlike condition, while the curation logic written around it does not.
+        </p>
+      </div>
+    </div>
+    <p class="prose-measure mt-4 text-xs leading-relaxed text-[var(--color-muted)]">
+      Map data © OpenStreetMap contributors, available under the ODbL. If you redistribute anything
+      derived from it, that attribution has to travel with it.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      We do not feed the aggregators, and that is a decision
+    </h2>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      We do not register or syndicate our GTFS with Google Maps, Apple Maps, Moovit, Transit App or
+      any other journey planner or aggregator. We are not a transport data provider and we do not
+      want to be mistaken for one.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      The reason is accuracy. An aggregator that shows a departure is making a claim to a passenger
+      holding a phone at a stop. We cannot support that claim: we have no vehicle feed, we cannot
+      know about a cancellation, and our validity window is seven days. Being a listed data source
+      would be good for our traffic and bad for our correctness, and it would put an accuracy
+      obligation on a project that cannot meet it.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      The second reason is liability. Publishing a schedule as an editorial reference page and
+      publishing it as a service that feeds a routing engine are different activities with different
+      legal consequences, and we would rather be the first. The terms are set out in
+      <a href={localeUrl(locale, '/legal/terms')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+        terms of use</a>.
+    </p>
+    <p class="prose-measure mt-3 leading-relaxed text-[var(--color-ink-soft)]">
+      What is fine, and encouraged: linking out. If you want walking directions from a stop to a
+      beach, or a road route between two villages, send people to a map service of their choice. We
+      have no objection to a deep link out of a CycladesGo page for that purpose. We only object to
+      being wired in as a real-time source of truth.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Before you build on this
+    </h2>
+    <ol class="mt-5 space-y-3">
+      {
+        [
+          ['Read the known-limits page', 'Interpolation, validity windows and the per-island gaps are all documented, and they will affect your output.'],
+          ['Check the validity date', 'The dataset is only trustworthy until the date printed on the island\'s data page. Expiry means the build fails, not that the data silently rots.'],
+          ['Keep the attribution', 'CycladesGo under CC-BY 4.0, and OpenStreetMap contributors under ODbL 1.0 for the derived parts.'],
+          ['Do not present it as current', 'If your product shows a departure to somebody standing at a stop, label it as a scheduled time and give its date.'],
+        ].map(([title, body], index) => (
+          <li class="flex gap-4">
+            <span class="tabular mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-aegean-bg)] text-xs font-semibold text-[var(--color-aegean-deep)]">
+              {index + 1}
+            </span>
+            <div>
+              <p class="text-sm font-semibold text-[var(--color-ink)]">{title}</p>
+              <p class="mt-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-14 flex flex-wrap gap-3">
+      <a
+        href={localeUrl(locale, '/data/quality')}
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline transition-colors hover:bg-[var(--color-aegean-btn-hover)]"
+      >
+        {t('data.quality')}
+        <Icon name="arrow-right" size={16} />
+      </a>
+      <a
+        href={SITE.repo}
+        rel="noopener"
+        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 text-sm font-semibold text-[var(--color-ink-soft)] no-underline transition-colors hover:bg-[var(--color-surface-2)]"
+      >
+        Source code
+        <Icon name="external" size={15} />
+      </a>
+    </div>
+  </div>
+</BaseLayout>

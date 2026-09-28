@@ -1,0 +1,290 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import { ISLANDS } from '../../data/islands';
+import { SITE } from '../../data/site';
+import { useTranslations } from '../../i18n/ui';
+import { LOCALES, localeUrl } from '../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/report';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+const problemKinds = [
+  { value: 'wrong-time', label: 'A time is wrong' },
+  { value: 'wrong-stop', label: 'A stop is in the wrong place' },
+  { value: 'wrong-fare', label: 'A fare is wrong' },
+  { value: 'cancelled', label: 'A service does not exist or is not running' },
+  { value: 'source', label: 'I have a timetable source you could use' },
+  { value: 'other', label: 'Something else' },
+] as const;
+
+const correctionPolicy = [
+  {
+    step: 'You report it',
+    body: 'Island, what kind of problem, and what you actually saw. A photo of the printed timetable or the operator\'s page is worth more than a description of it.',
+  },
+  {
+    step: 'We check against the operator',
+    body: 'Before anything changes, the report goes back to the source. If the operator still says what we published, we do not change it on a second-hand account.',
+  },
+  {
+    step: 'It enters the changelog',
+    body: 'If the published figure is wrong, the fix is dated and written up in the public changelog with what changed and what caused it. Not every report becomes a changelog entry; a confirmed correction always does.',
+  },
+  {
+    step: 'We tell you',
+    body: 'If you gave us an address, you get a reply saying what we did, including "we checked and the operator is right, you were right, and nothing changed", which is a real answer and not a brush-off.',
+  },
+];
+---
+
+<BaseLayout
+  title="Report a problem or a timetable source"
+  description="Report a wrong time, a stop in the wrong place, a wrong fare or a missing service, or send a timetable for an island we do not cover. How we check and reply."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([{ name: 'Home', path: '/' }, { name: 'Report a problem', path }]),
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('footer.report')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('footer.report')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      If a time, a stop or a fare here is wrong, we want to know. If you have a timetable for an
+      island we do not cover, we want that more. Both go to the same place and both get read by a
+      person.
+    </p>
+
+    <div
+      class="mt-8 rounded-[var(--radius-lg)] border-2 border-[var(--color-sun)] bg-[var(--color-sun-bg)] p-5"
+      role="note"
+    >
+      <h2 class="flex items-center gap-2 text-base font-semibold text-[var(--color-sun-ink)]">
+        <Icon name="warning" size={18} class="shrink-0" />
+        This form is switched off in this build
+      </h2>
+      <div class="mt-2 space-y-2 text-sm leading-relaxed text-[var(--color-sun-ink)]">
+        <p>
+          What you can see below is the real form, with real fields and real wording, and none of it
+          works. It is disabled rather than hidden so that the shape of the thing is reviewable, and
+          so that nobody fills it in and waits for a reply that will never come.
+        </p>
+        <p>
+          Before launch it posts to a form handler that forwards the contents to a maintained
+          address and stores nothing. Reports are not published, quoted or listed anywhere unless the
+          person who sent one asks us to, by name or anonymously as they prefer. The one exception
+          is a confirmed correction to a published figure, which goes into the public changelog by
+          default — that page describes changes to the dataset, not people.
+        </p>
+        <p>
+          For now, use the e-mail fallback below. It reaches the same inbox the form will reach.
+        </p>
+      </div>
+    </div>
+
+    <form class="mt-10" novalidate aria-describedby="form-disabled-note">
+      <fieldset disabled class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 opacity-70 sm:p-6">
+        <legend class="px-1 text-sm font-semibold text-[var(--color-ink)]">
+          The form, as it will appear
+        </legend>
+
+        <div class="mt-2 space-y-5">
+          <div>
+            <label for="report-island" class="block text-sm font-medium text-[var(--color-ink)]">
+              Which island?
+            </label>
+            <select
+              id="report-island"
+              name="island"
+              disabled
+              class="mt-1.5 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-ink)]"
+            >
+              {ISLANDS.map((island) => <option value={island.id}>{island.name}</option>)}
+              <option value="not-listed">An island you do not list</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend class="text-sm font-medium text-[var(--color-ink)]">What kind of problem is it?</legend>
+            <div class="mt-2 space-y-2">
+              {
+                problemKinds.map((kind, index) => (
+                  <label class="flex items-start gap-2.5 text-sm text-[var(--color-ink-soft)]">
+                    <input
+                      type="radio"
+                      name="kind"
+                      value={kind.value}
+                      id={`report-kind-${kind.value}`}
+                      disabled
+                      checked={index === 0}
+                      class="mt-1 h-4 w-4 shrink-0 accent-[var(--color-aegean)]"
+                    />
+                    <span>{kind.label}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+
+          <div>
+            <label for="report-detail" class="block text-sm font-medium text-[var(--color-ink)]">
+              What did you see?
+            </label>
+            <p id="report-detail-hint" class="mt-1 text-xs leading-relaxed text-[var(--color-muted)]">
+              The line, the stop, the time you expected and the time that was published. If you
+              photographed the operator's timetable or their page, say so — a link or a screenshot is
+              the fastest possible route to a correction.
+            </p>
+            <textarea
+              id="report-detail"
+              name="detail"
+              rows="5"
+              disabled
+              aria-describedby="report-detail-hint"
+              class="mt-1.5 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-ink)]"
+            >
+            </textarea>
+          </div>
+
+          <div>
+            <label for="report-email" class="block text-sm font-medium text-[var(--color-ink)]">
+              E-mail, only if you want a reply
+            </label>
+            <p id="report-email-hint" class="mt-1 text-xs leading-relaxed text-[var(--color-muted)]">
+              Optional. Without it we cannot tell you what we did with the report, but we will still
+              check it.
+            </p>
+            <input
+              type="email"
+              id="report-email"
+              name="email"
+              disabled
+              aria-describedby="report-email-hint"
+              autocomplete="email"
+              class="mt-1.5 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-ink)]"
+            />
+          </div>
+
+          <div class="flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="report-publish"
+              name="publish"
+              disabled
+              class="mt-1 h-4 w-4 shrink-0 accent-[var(--color-aegean)]"
+            />
+            <label for="report-publish" class="text-sm leading-relaxed text-[var(--color-ink-soft)]">
+              You may publish this report and my name. Unchecked, nothing about me is published.
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled
+            class="cursor-not-allowed rounded-[var(--radius-md)] bg-[var(--color-muted)] px-5 py-3 text-sm font-semibold text-[var(--color-surface)]"
+          >
+            Send report
+          </button>
+          <p id="form-disabled-note" class="text-xs leading-relaxed text-[var(--color-muted)]">
+            Disabled. The button does nothing, which is intentional.
+          </p>
+        </div>
+      </fieldset>
+    </form>
+
+    <div
+      class="mt-6 rounded-[var(--radius-lg)] border border-[var(--color-aegean)] bg-[var(--color-aegean-bg)] p-5"
+    >
+      <h2 class="flex items-center gap-2 text-base font-semibold text-[var(--color-aegean-deep)]">
+        <Icon name="shield" size={17} class="shrink-0" />
+        E-mail fallback, working now
+      </h2>
+      <p class="mt-2 text-sm leading-relaxed text-[var(--color-aegean-deep)]">
+        Send the island, the problem and what you saw to
+        <a
+          class="font-semibold underline underline-offset-2"
+          href={`mailto:${SITE.email}?subject=Timetable%20report`}
+        >{SITE.email}</a>
+        with <code class="tabular">Timetable report</code> in the subject line. In the current build
+        that address is a placeholder; the real one is published in the
+        <a href={localeUrl(locale, '/legal')} class="underline underline-offset-2">imprint</a> before
+        launch.
+      </p>
+    </div>
+
+    <section aria-labelledby="policy" class="mt-14">
+      <SectionHeading id="policy">What happens to a report</SectionHeading>
+      <ol class="mt-5 space-y-4">
+        {
+          correctionPolicy.map((item, index) => (
+            <li class="flex gap-4">
+              <span class="tabular mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-aegean-bg)] text-xs font-semibold text-[var(--color-aegean-deep)]">
+                {index + 1}
+              </span>
+              <div>
+                <h3 class="text-sm font-semibold text-[var(--color-ink)]">{item.step}</h3>
+                <p class="mt-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">{item.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="prose-measure mt-6 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <p>
+          <strong class="font-semibold text-[var(--color-ink)]">Turnaround.</strong> Two working days
+          to acknowledge, and five working days to say what we found. A confirmed correction ships
+          in the next build rather than at the end of the week, and it carries the date it was
+          confirmed. If a fix needs an adapter to be rewritten because an operator has redesigned
+          their website, that is longer, and we will say so instead of going quiet.
+        </p>
+        <p>
+          <strong class="font-semibold text-[var(--color-ink)]">We publish the correction even when
+          it makes us look bad.</strong> That is the whole point of a
+          <a href={localeUrl(locale, '/data/changelog')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+            public changelog</a>: the Naxos outage of 26 September and the Paros coordinate collision
+          of 19 September are on that page with their dates and their causes. A site that quietly
+          fixes things and says nothing about them is asking for trust it has not earned.
+        </p>
+        <p>
+          <strong class="font-semibold text-[var(--color-ink)]">What we cannot do.</strong> We
+          cannot tell you whether a bus is running today, and a report saying a service was late
+          will not change a published schedule, because the schedule is the operator's and it does
+          not record lateness. We cannot change a fare an operator has set. And we cannot put an
+          island in the planner on the strength of a screenshot — it needs a source we can re-read,
+          which is exactly what the "I have a timetable source" option is for.
+        </p>
+      </div>
+    </section>
+
+    <p class="prose-measure mt-12 border-t border-[var(--color-border)] pt-6 text-xs leading-relaxed text-[var(--color-muted)]">
+      Reports are handled as correspondence, not as a support ticket queue. We are one small project
+      and we answer our own e-mail. For a specific bus on a specific afternoon, the operator's
+      telephone number is on every island page and is faster than any of this.
+    </p>
+  </div>
+</BaseLayout>

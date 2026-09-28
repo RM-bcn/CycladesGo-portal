@@ -1,0 +1,128 @@
+---
+import Icon from './ui/Icon.astro';
+import { ISLANDS } from '../data/islands';
+import { SITE } from '../data/site';
+import { useTranslations } from '../i18n/ui';
+import { localeUrl, type Locale } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const href = (path: string) => localeUrl(locale, path);
+
+const legalLinks = [
+  { href: '/legal', key: 'footer.legal' },
+  { href: '/legal/privacy', key: 'footer.privacy' },
+  { href: '/legal/terms', key: 'footer.terms' },
+  { href: '/legal/cookies', key: 'footer.cookies' },
+  { href: '/legal/accessibility', key: 'footer.accessibility' },
+] as const;
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-[var(--color-border)] bg-[var(--color-surface-2)]">
+  <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <p class="max-w-[42ch] text-sm leading-relaxed text-[var(--color-ink-soft)]">
+          {t('footer.rights')}
+        </p>
+        <p class="mt-4 text-xs leading-relaxed text-[var(--color-muted)]">
+          {t('footer.attribution')}
+        </p>
+        <a
+          href={href('/sponsors')}
+          class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-bougainvillea)] no-underline hover:underline"
+        >
+          <Icon name="heart" size={15} />
+          {t('footer.donations')}
+        </a>
+      </div>
+
+      <nav aria-labelledby="footer-islands">
+        <h2 id="footer-islands" class="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+          {t('nav.islands')}
+        </h2>
+        <ul class="mt-3 space-y-1.5">
+          {
+            ISLANDS.map((island) => (
+              <li>
+                <a
+                  href={`${island.currentUrl}/en/`}
+                  rel="noopener"
+                  class="text-sm text-[var(--color-ink-soft)] no-underline hover:text-[var(--color-aegean)] hover:underline"
+                >
+                  {island.brand}
+                  <span class="text-[var(--color-muted)]"> — {island.name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="footer-legal" class="flex flex-col">
+        <h2 id="footer-legal" class="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+          {t('footer.legal')}
+        </h2>
+        <ul class="mt-3 space-y-1.5">
+          <li>
+            <a href={href('/legal')} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+              {t('footer.imprint')}
+            </a>
+          </li>
+          {
+            legalLinks.map((link) => (
+              <li>
+                <a href={href(link.href)} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+                  {t(link.key)}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={href('/data/methodology')} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+              {t('footer.methodology')}
+            </a>
+          </li>
+          <li>
+            <a href={href('/report')} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+              {t('footer.report')}
+            </a>
+          </li>
+          <li>
+            <a href="/llms.txt" class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+              llms.txt
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!--
+      PD 131/2003 Art. 4(1) requires name, address and contact to be "easily,
+      directly and continuously accessible". That is why the imprint is in the
+      footer of every page and not only on /legal. Placeholder values render as
+      visibly pending so an unfilled field can never be mistaken for a real legal
+      identity.
+    -->
+    <div class="mt-10 border-t border-[var(--color-border)] pt-6 text-xs leading-relaxed text-[var(--color-muted)]">
+      <p>
+        <strong class="font-semibold text-[var(--color-ink-soft)]">{t('footer.imprint')}:</strong>{' '}
+        {SITE.legalName} · {SITE.address} · <a class="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        · VAT {SITE.vat} · GEMI {SITE.gemi}
+      </p>
+      <p class="mt-3">
+        <strong class="font-semibold text-[var(--color-ink-soft)]">{t('legal.disclaimerTitle')}:</strong>{' '}
+        CycladesGo is an independent commercial project. It is not affiliated with, endorsed by,
+        authorised by or operated by KTEL Naxos, KTEL Paros, KTEL Cyclades, Milos Buses or any other
+        bus or ferry operator, and it is not a ticket sales office. Operator names appear solely to
+        identify who runs each service. We publish schedules, not live departures.
+      </p>
+      <p class="mt-3">© {year} {SITE.legalName} · Source code: <a class="underline" href={SITE.repo} rel="noopener">{SITE.repo}</a></p>
+    </div>
+  </div>
+</footer>

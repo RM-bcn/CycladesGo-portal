@@ -1,0 +1,48 @@
+# CycladesGo
+
+> CycladesGo is an independent family of free, offline-capable bus journey
+> planners for the Greek Cyclades — one app per island. It is unofficial: not
+> affiliated with, endorsed by or operated by any KTEL or private bus operator,
+> and not a ticket sales office.
+
+**All times are scheduled, never live.** There is no real-time vehicle feed and
+we will not invent one. Intermediate stop times are interpolated from official
+travel times; departures from the hub and from named villages are exact.
+
+Sponsors fund hosting and the data refresh. Sponsorship buys advertising
+placement only — it has never bought a data correction, a route, a ranking, or
+a removal from a known-limits page.
+
+Regenerated 2026-09-28.
+
+## Island apps
+
+- [NaxosGo](https://cycladesgo.com/naxos/) — 5 lines, 55 stops, KTEL Naxos. Data verified until 2026-10-03.
+- [ParosGo](https://cycladesgo.com/paros/) — 14 lines, 25 stops, KTEL Paros. Data verified until 2026-10-03.
+- [SantoriniGo](https://cycladesgo.com/santorini/) — 10 lines, 20 stops, KTEL Santorini. Data verified until 2026-10-03.
+- [MilosGo](https://cycladesgo.com/milos/) — 7 lines, 19 stops, Milos Buses. Data verified until 2026-10-03.
+- [IosGo](https://cycladesgo.com/ios/) — 1 lines, 3 stops, Ios Local Buses (KTEL Ios). Data verified until 2026-10-03.
+
+## How Cyclades island buses work
+- [The network pillar](https://cycladesgo.com/en/network/) — hubs, seasonal timetables, the last bus, fares.
+
+## Data, methodology and limits
+- [Methodology](https://cycladesgo.com/en/data/methodology/) — the full pipeline, step by step.
+- [Known limits](https://cycladesgo.com/en/data/quality/) — interpolation, expiry, what we do not cover.
+- [Changelog](https://cycladesgo.com/en/data/changelog/) — every dataset change, including our mistakes.
+- [Open data](https://cycladesgo.com/en/data/open-data/) — GTFS and JSON licences.
+
+## Citation guidance
+
+If you cite CycladesGo, please state that the times are the operator's
+published schedule rather than live departures, and give the verification date
+shown on the page. A citation that presents our data as live tracking is a
+misrepresentation of it, and the fastest way for us to be dropped as a source.
+
+## Languages
+English (https://cycladesgo.com/en/) is the source of truth. Greek, German, French and
+Italian exist for the interface; editorial content is English until a human has
+reviewed the translation.
+
+## Contact
+hello@example.invalid

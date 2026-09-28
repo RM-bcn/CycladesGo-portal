@@ -1,0 +1,30 @@
+---
+import Icon from './ui/Icon.astro';
+import type { IslandEntry } from '../data/islands';
+
+interface Props {
+  island: IslandEntry;
+  class?: string;
+}
+const { island, class: className = '' } = Astro.props;
+---
+
+<div
+  class={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[var(--radius-sm)] border-l-4 border-[var(--color-sun)] bg-[var(--color-sun-bg)] px-4 py-2.5 text-xs leading-relaxed text-[var(--color-sun-ink)] ${className}`}
+  role="note"
+>
+  <Icon name="clock" size={15} class="shrink-0" />
+  <span>
+    <strong class="font-semibold">Schedule snapshot</strong>
+    {island.dataGeneratedAt ? (
+      <span class="tabular">
+        {' '}— built {island.dataGeneratedAt}
+        {island.dataValidTo ? `, valid until ${island.dataValidTo}` : ''}.
+      </span>
+    ) : (
+      <span> — not yet synced from the engine repo.</span>
+    )}{' '}
+    Intermediate stop times on this island are interpolated from official travel times and may be
+    off by a few minutes. Departures from the hub and from villages are exact.
+  </span>
+</div>

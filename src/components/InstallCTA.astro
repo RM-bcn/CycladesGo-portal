@@ -1,0 +1,42 @@
+---
+import Icon from './ui/Icon.astro';
+import type { IslandEntry } from '../data/islands';
+
+interface Props {
+  island: IslandEntry;
+  /** `hero` = primary conversion, `inline` = after a paragraph. */
+  variant?: 'hero' | 'inline';
+  /** Pre-filled planner parameters, so the CTA is a deep link not a homepage. */
+  from?: string;
+  to?: string;
+  arrive?: string;
+  class?: string;
+}
+const { island, variant = 'hero', from, to, arrive, class: className = '' } = Astro.props;
+
+const params = new URLSearchParams();
+if (from) params.set('from', from);
+if (to) params.set('to', to);
+if (arrive) params.set('arrive', arrive);
+params.set('ref', 'portal');
+const planner = `${island.currentUrl}/en/plan${params.size ? `?${params}` : ''}`;
+---
+
+<div class={className}>
+  <a
+    href={planner}
+    data-track="app_deeplink_click"
+    data-island={island.id}
+    class={`inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 font-semibold text-[var(--color-aegean-btn-text)] no-underline shadow-[var(--shadow-cube)] transition-colors hover:bg-[var(--color-aegean-btn-hover)] ${
+      variant === 'hero' ? 'text-base' : 'text-sm'
+    }`}
+  >
+    <Icon name="download" size={18} />
+    Open {island.brand}
+    <Icon name="arrow-right" size={16} />
+  </a>
+  <p class="mt-2 max-w-[46ch] text-xs leading-relaxed text-[var(--color-muted)]">
+    {island.brand} is an independent app. We are not affiliated with {island.operator.name}, and we
+    do not sell, book or issue tickets. It installs to your home screen and works with no signal.
+  </p>
+</div>

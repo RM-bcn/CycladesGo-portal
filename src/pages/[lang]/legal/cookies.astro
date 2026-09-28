@@ -1,0 +1,85 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalLayout from '../../../layouts/LegalLayout.astro';
+import { LOCALES } from '../../../i18n/utils';
+import { resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const dateModified = '2026-09-28';
+---
+
+<LegalLayout
+  title="Cookies"
+  description="No cookies, no consent banner, no advertising or analytics scripts. What is stored, where, and what must change before any analytics tool is ever added."
+  locale={locale}
+  path="/legal/cookies"
+  dateModified={dateModified}
+  icon="database"
+>
+  <h2 class="text-lg font-semibold text-[var(--color-ink)]">No cookies</h2>
+  <p>
+    This site sets no cookies. None. Not for preferences, not for sessions, not for measurement, not
+    for advertising. There is no first-party storage and no third-party storage.
+  </p>
+  <p>
+    There is no consent banner, because a banner would be a lie: there is nothing to consent to. If
+    you have seen one here, you were looking at a different site.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">The one thing we do store</h2>
+  <p>
+    Your light or dark theme choice, in your browser's local storage, under the key
+    <code class="tabular">cg-theme</code>. It stays on your device, it is never transmitted, and it is
+    removed when you clear site data for the site. It is not a cookie, it is not readable by us, and
+    it identifies nobody.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Analytics, and the line we will not cross without changing this page</h2>
+  <p>
+    There is one measurement activity, and it happens on our servers rather than yours. Request logs
+    are truncated and anonymised at the edge before they are stored, and raw logs are deleted after
+    30 days. Nothing is loaded into your browser to measure you, so there is nothing to block and
+    nothing to consent to.
+  </p>
+  <p>
+    If a client-side analytics tool is ever added — a script in your browser that builds a profile
+    and reports it back — then this page must be rewritten first, and a consent mechanism must exist
+    before the tool is loaded, not after. German and Austrian visitors are the reason this is stated
+    as a hard rule rather than a preference: in those jurisdictions consent must be obtained before
+    the first storage, and there is no reading of our current position that would let us skip it.
+    We would rather not add such a tool than spend the project's credibility on a consent dialog.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Crawlers, including AI crawlers</h2>
+  <p>
+    Search engine crawlers and AI crawlers are both welcome. Nothing on this site is blocked for
+    being a bot, and no crawler is served a different page from a person. If you quote this site, the
+    fair thing is to quote the date on the page and to say the times are scheduled rather than
+    observed. That is the whole of our position on citation, and it is set out in full on the
+    <a class="underline" href="/data/quality">known limits</a> page.
+  </p>
+  <p>
+    Crawling is not the same as syndication. We do not register or feed our timetable data to Google
+    Maps, Apple Maps, Moovit, Transit App or any other aggregator, so a crawler reading our pages will
+    find a schedule with a date on it rather than a source that is treated as a departure board. The
+    reason is accuracy, and it is explained on the
+    <a class="underline" href="/data/open-data">open data</a> page.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Third-party embeds</h2>
+  <p>
+    There are none. No video embeds, no advertising tags, no chat widgets, no embedded maps that
+    phone home, no social media pixels. The map tiles in the island planners are a static asset served
+    from our own host, not a live third-party tile service, which is also how they keep working with
+    no signal.
+  </p>
+
+  <p class="border-t border-[var(--color-border)] pt-4 text-sm">
+    <span class="tabular">Date last updated: {dateModified}</span>. If this page ever stops being
+    true, that is a bug with a higher priority than most features, and the
+    <a class="underline" href="/legal/privacy">privacy notice</a> is the page that has to be updated
+    with it.
+  </p>
+</LegalLayout>

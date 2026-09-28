@@ -1,0 +1,276 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { SITE } from '../../data/site';
+import { useTranslations } from '../../i18n/ui';
+import { LOCALES, localeUrl } from '../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/sponsors';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+const buys = [
+  'A named placement in a clearly marked sponsored container, at a size and position agreed in advance.',
+  'An image, a link to the sponsor\'s own site, and a line of copy that the sponsor supplies and we publish verbatim.',
+  'A mention in the sponsor\'s own material, if it chooses to make one. We do not supply a logo pack and we do not imply endorsement by the operators.',
+];
+
+const neverBuys = [
+  {
+    item: 'Data accuracy',
+    detail:
+      'No amount of money changes a departure time, a fare, a coordinate or a validity date. Those come from operators, from OpenStreetMap and from hand verification. A sponsor who tells us a figure is wrong is making a report like anybody else, and it is handled like anybody else.',
+  },
+  {
+    item: 'Route inclusion or exclusion',
+    detail:
+      'An island is published because we have a usable timetable for it and a person who can verify it. The islands we are not covering are listed because we have nothing, not because nobody paid.',
+  },
+  {
+    item: 'Ranking, ordering or prominence within editorial content',
+    detail:
+      'Which island, line or topic appears first on a page is decided by what helps the reader. It is not for sale at any price.',
+  },
+  {
+    item: 'Removal, softening or omission from a known-limits page',
+    detail:
+      'This one is absolute. Nothing on the known-limits page, the methodology page or the changelog has ever been, or will ever be, affected by a commercial relationship. If a sponsor needs a limitation removed, the answer is no and it stays no.',
+  },
+  {
+    item: 'A word in an article',
+    detail:
+      'Editorial pages are not written for sponsors. There is no advertorial, no sponsored article, and no ghost-written recommendation of anything.',
+  },
+  {
+    item: 'Removal of a correction',
+    detail:
+      'We publish corrections that make us look bad, and we publish them with the date they happened. That obligation is not conditional on who is paying.',
+  },
+];
+---
+
+<BaseLayout
+  title={t('sponsors.title')}
+  description="What sponsorship buys and the six things it can never buy: no data correction, no route changes, no ranking, no removal of a known limitation, no advertorial."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([{ name: 'Home', path: '/' }, { name: 'Sponsors', path }]),
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('sponsors.title')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('sponsors.title')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      {t('sponsors.lede')}
+    </p>
+
+    <div
+      class="mt-8 rounded-[var(--radius-lg)] border-2 border-[var(--color-bougainvillea)] bg-[var(--color-bougainvillea-bg)] p-6"
+    >
+      <p class="text-xs font-semibold uppercase tracking-wide text-[var(--color-bougainvillea)]">
+        The one-sentence version
+      </p>
+      <p class="mt-2 text-base font-semibold leading-relaxed text-[var(--color-ink)]">
+        Sponsorship buys advertising placement and nothing else. It has never bought and will never
+        buy a data correction, a route being added or removed, a ranking, a word in an article, or
+        the deletion of a known limitation.
+      </p>
+    </div>
+
+    <p class="prose-measure mt-6 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      This page exists because the project is commercial. A free service for travellers and a paid
+      placement for a business are both ordinary things to do; running them in the same place
+      without a written rule is not. So the rule is written down, in public, and the
+      <a href={localeUrl(locale, '/legal')} class="underline underline-offset-2">imprint</a> points
+      here.
+    </p>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      What sponsorship is
+    </h2>
+    <ul class="prose-measure mt-4 space-y-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      {
+        buys.map((item) => (
+          <li class="flex gap-2.5">
+            <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+            <span>{item}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      What sponsorship can never buy
+    </h2>
+    <p class="prose-measure mt-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      This is the list that matters, so it is written out item by item rather than as a general
+      assurance.
+    </p>
+    <dl class="mt-5 space-y-4">
+      {
+        neverBuys.map((item) => (
+          <div class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)]">
+            <dt class="flex items-start gap-2 text-base font-semibold text-[var(--color-ink)]">
+              <Icon name="unofficial" size={16} class="mt-1 shrink-0 text-[var(--color-terracotta)]" />
+              {item.item}
+            </dt>
+            <dd class="mt-2 pl-6 text-sm leading-relaxed text-[var(--color-ink-soft)]">{item.detail}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The editorial firewall
+    </h2>
+    <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <p>
+        Sponsored content appears in its own container, with its own visual treatment, its own
+        background and its own border. It is not inline with editorial text and it is not styled to
+        blend in. A reader must be able to tell, without reading a label, which is which.
+      </p>
+      <p>
+        It is never placed inside an article body. There is no sponsored paragraph, no sponsored
+        sidebar within editorial copy, and no sponsored module inside the
+        <a href={localeUrl(locale, '/data/quality')} class="underline underline-offset-2">
+          known-limits page</a>, the methodology page or the changelog. If a page is about accuracy, it
+        carries no advertising at all.
+      </p>
+      <p>
+        Sponsored pages and posts carry the word "Sponsored" in the title, in the page metadata and
+        in the visible heading, not only in a small print line. Search engines are not relied on to
+        keep the distinction, and neither are we.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Identification of advertising
+    </h2>
+    <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <p>
+        Every sponsored item names the sponsor and makes it identifiable without clicking anything.
+        That is required, not stylistic. Article 7 of Directive 2005/29/EC on unfair commercial
+        practices requires commercial intent to be identifiable, and Greek consumer law applies the
+        same requirement in national courts. A placement that could plausibly be mistaken for our own
+        recommendation is a breach, and we would remove it and repay the money.
+      </p>
+      <p>
+        The same rule applies to anything a sponsor asks us to write about itself. A sponsored
+        description of the sponsor's own business is advertising, it is labelled as advertising, and
+        it is not edited to look like our own voice.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      The correctness guarantee
+    </h2>
+    <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <p>
+        Some sponsors' businesses depend on our data being right. A taxi company, a ferry company, a
+        tour operator or a hotel will lose money when a traveller cannot get back from a beach, and
+        they will come to us about it. That is fair, and here is the position in advance.
+      </p>
+      <p>
+        Every time on this site is a scheduled time from the operator's published timetable, dated.
+        It is not an observation, and we do not have a feed that would make it one. We cannot tell
+        you whether a bus is running, late or cancelled, and no commercial arrangement will change
+        that. If that is a problem for a business model, the answer is to take a feed from the
+        operator, not to ask us to invent one.
+      </p>
+      <p>
+        Our liability is limited to the extent Greek law permits, and the terms of use set out where
+        that leaves you. We are not a travel agency, we are not a contract carrier, and no contract is
+        concluded for the free parts of this site. The realistic worst outcome is a modest damages
+        award, and there is no punitive damages regime to fear.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Donations
+    </h2>
+    <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+      <p>
+        A donation pays for hosting, the domain, the data refresh and the time it takes to keep the
+        adapters working when an operator redesigns their website. It buys nothing else, and it is
+        held to the same six rules as sponsorship.
+      </p>
+      <p>
+        A donation is not a purchase. It gives no rights in the content, no influence over it, no
+        service level, no priority in a support reply, and no claim on the project. There is nothing
+        to cancel, and nothing to be owed if we stop.
+      </p>
+      <p>
+        Donations are refunded on request if you made one by mistake or if the project stops running.
+        A request goes to the same address as everything else, and a refund is not a negotiation.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      Become a sponsor
+    </h2>
+    <div
+      class="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-lift)]"
+    >
+      <p class="text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        Before a first placement we want one thing from you in writing: an acknowledgement that the
+        six items above are not for sale. If that is not a problem, the rest is ordinary. Tell us
+        what you want to say, where you want it, and how long you want it for, and we will come back
+        with a price and a date.
+      </p>
+      <p class="mt-4 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        E-mail:{' '}
+        <a class="font-semibold text-[var(--color-aegean)] underline underline-offset-2" href={`mailto:${SITE.email}`}>
+          {SITE.email}
+        </a>{' '}
+        with <code class="tabular">Sponsorship</code> in the subject line. In the current build that
+        address is a placeholder; the real one is published in the
+        <a href={localeUrl(locale, '/legal')} class="underline underline-offset-2">imprint</a> before
+        launch.
+      </p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a
+          href={`mailto:${SITE.email}?subject=Sponsorship`}
+          class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-bougainvillea)] px-5 py-3 text-sm font-semibold text-[var(--color-surface)] no-underline transition-colors hover:bg-[var(--color-ink)]"
+        >
+          {t('footer.donations')}
+          <Icon name="heart" size={15} />
+        </a>
+        <a
+          href={localeUrl(locale, '/legal/terms')}
+          class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 text-sm font-semibold text-[var(--color-ink-soft)] no-underline transition-colors hover:bg-[var(--color-surface-2)]"
+        >
+          {t('legal.termsTitle')}
+        </a>
+      </div>
+    </div>
+
+    <p class="prose-measure mt-10 border-t border-[var(--color-border)] pt-6 text-xs leading-relaxed text-[var(--color-muted)]">
+      A final word on why this page is written in a stern voice. The temptation in a project this
+      small is to treat a friendly sponsor as a favour. It is not one. A visitor who pays us and then
+      reads our timetable is owed the same schedule we would publish if nobody had paid, and the only
+      way to hold that line is to write down what it is before the first cheque arrives.
+    </p>
+  </div>
+</BaseLayout>

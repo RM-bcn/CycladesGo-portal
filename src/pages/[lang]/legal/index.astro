@@ -1,0 +1,97 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalLayout from '../../../layouts/LegalLayout.astro';
+import { SITE } from '../../../data/site';
+import { LOCALES } from '../../../i18n/utils';
+import { resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const dateModified = '2026-09-28';
+
+/** Renders a value, or a visibly-pending marker. Never invents a legal identity. */
+const field = (value: string, fallback: string) =>
+  value && !/pending|invalid$/i.test(value) ? value : fallback;
+---
+
+<LegalLayout
+  title="Imprint & identification"
+  description="Legal identification of CycladesGo, the operator contact details, VAT and company register numbers, and the statement that we are not affiliated with any bus operator."
+  locale={locale}
+  path="/legal"
+  dateModified={dateModified}
+  icon="unofficial"
+>
+  <h2 class="text-lg font-semibold text-[var(--color-ink)]">Service provider</h2>
+  <p>
+    This website is operated by <strong class="font-semibold text-[var(--color-ink)]"
+      >{field(SITE.legalName, 'CycladesGo (legal entity details pending)')}</strong
+    >, an independent business trading as CycladesGo.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Identification details</h2>
+  <dl class="grid gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,10rem)_1fr]">
+    <dt class="font-medium text-[var(--color-ink)]">Name</dt>
+    <dd>{field(SITE.legalName, 'pending registration')}</dd>
+    <dt class="font-medium text-[var(--color-ink)]">Address</dt>
+    <dd>{field(SITE.address, 'pending — set CYCLADESGO_ADDRESS before launch')}</dd>
+    <dt class="font-medium text-[var(--color-ink)]">E-mail</dt>
+    <dd><a class="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
+    <dt class="font-medium text-[var(--color-ink)]">Telephone</dt>
+    <dd>pending</dd>
+    <dt class="font-medium text-[var(--color-ink)]">VAT number</dt>
+    <dd>{field(SITE.vat, 'pending — set CYCLADESGO_VAT before launch')}</dd>
+    <dt class="font-medium text-[var(--color-ink)]">Company register (GEMI)</dt>
+    <dd>{field(SITE.gemi, 'pending — set CYCLADESGO_GEMI before launch')}</dd>
+    <dt class="font-medium text-[var(--color-ink)]">Supervisory authority</dt>
+    <dd>pending — competent authority to be named before launch</dd>
+  </dl>
+
+  <p class="rounded-[var(--radius-md)] border-l-4 border-[var(--color-sun)] bg-[var(--color-sun-bg)] px-4 py-3 text-xs leading-relaxed text-[var(--color-sun-ink)]">
+    The identification fields above are intentionally shown as <em>pending</em> until they are filled
+    in. This is a design prototype, not a live service, and publishing a placeholder that reads like
+    a real registration number would be worse than publishing nothing.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Unofficial — no affiliation</h2>
+  <p>
+    CycladesGo is not affiliated with, endorsed by, authorised by or operated by KTEL Naxos, KTEL
+    Paros, KTEL Cyclades, Milos Buses, Ios Local Buses or any other bus or ferry operator, and it is
+    not a ticket sales office. Operator names and trade marks appear on this site solely to identify
+    who actually runs each service, and always next to a link to that operator's own site. We
+    reproduce no operator logo, wordmark graphic or timetable artwork.
+  </p>
+  <p>
+    We publish an operator's published schedule, not a live departure board. There is no real-time
+    vehicle feed, and we cannot tell you whether a bus is running late. Timetables can change
+    without notice, and seasonal, engineering-work and event-related changes are not always
+    reflected here. Always confirm with the operator before travelling.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Sponsorship and commercial relationships</h2>
+  <p>
+    CycladesGo is a commercial project. It is funded by sponsorship and donations. Sponsorship buys
+    advertising placement only. It has never bought and will never buy a data correction, a route
+    being added or removed, a change to a known-limits page, or a word in an editorial article.
+    Sponsored content is marked as such and is kept visually and structurally separate from
+    editorial content. See the
+    <a class="underline" href="/sponsors">sponsorship policy</a>.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Consumer disputes</h2>
+  <p>
+    We are subject to the consumer protection rules of Greece and the European Union. In the event
+    of a dispute you may contact the competent consumer protection authority. Note that the former
+    European Online Dispute Resolution platform was withdrawn on 20 July 2025 and no longer exists;
+    we therefore give no ODR link. National alternative dispute resolution bodies are listed by the
+    European Commission.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Source code</h2>
+  <p>
+    The site and every island planner are open source: <a class="underline" href={SITE.repo} rel="noopener"
+      >{SITE.repo}</a
+    >. You can read exactly how every number on this site is produced, and you can host it yourself.
+  </p>
+</LegalLayout>

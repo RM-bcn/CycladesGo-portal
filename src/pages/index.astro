@@ -1,0 +1,31 @@
+---
+/**
+ * The locale-less root.
+ *
+ * `/` exists only to hand the visitor to `/en/`. It is `noindex` and carries a
+ * canonical pointing at `/en/`, so the same content is never indexable at two
+ * URLs. The hreflang `x-default` targets `/en/` directly — a cluster must never
+ * annotate a redirect, and a redirect here is deliberate rather than accidental.
+ */
+import { DEFAULT_LOCALE, localeUrl } from '../i18n/utils';
+import { SITE } from '../data/site';
+
+const target = new URL(localeUrl(DEFAULT_LOCALE, '/'), `${SITE.url}/`).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CycladesGo</title>
+    <link rel="canonical" href={target} />
+    <meta name="robots" content="noindex, follow" />
+    <meta http-equiv="refresh" content={`0; url=${localeUrl(DEFAULT_LOCALE, '/')}`} />
+  </head>
+  <body>
+    <p>
+      This site is available in English, Greek, German, French and Italian.
+      <a href={localeUrl(DEFAULT_LOCALE, '/')}>Continue in English</a>.
+    </p>
+  </body>
+</html>

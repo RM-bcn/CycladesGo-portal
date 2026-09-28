@@ -1,0 +1,252 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Card from '../../components/ui/Card.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import { SITE } from '../../data/site';
+import { useTranslations } from '../../i18n/ui';
+import { LOCALES, localeUrl } from '../../i18n/utils';
+import {
+  breadcrumbNode,
+  MAINTAINER_ID,
+  organizationNode,
+  ORGANIZATION_ID,
+} from '../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/about';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+const notThis = [
+  'Not a travel agency. We do not sell, book, reserve or issue bus tickets, and we take no commission on any fare.',
+  'Not a ticket sales office. There is no counter, no payment page and no seat reservation anywhere on this site.',
+  'Not affiliated with any operator. We are not connected to, endorsed by, authorised by or operated by KTEL Naxos, KTEL Paros, KTEL Cyclades, Milos Buses, Ios Local Buses or any ferry company. Operator names appear only to say who actually runs each service.',
+  'Not a departure board. Every time here is a scheduled time taken from a published timetable. We have no vehicle feed and cannot tell you whether a bus is running.',
+  'Not the operator\'s customer service. If a bus is late, cancelled or has left, the number you need is the operator\'s, and it is on every island page here.',
+];
+
+const maintainer = {
+  name: 'TODO: name of the person responsible',
+  handle: 'TODO: GitHub handle',
+  role: 'Maintainer',
+};
+
+/** Visible placeholder, deliberately not a real person: E-E-A-T and the imprint both need a named human before launch. */
+const personNode = {
+  '@type': 'Person',
+  '@id': MAINTAINER_ID,
+  name: maintainer.name,
+  jobTitle: 'Maintainer, CycladesGo',
+  description:
+    'Placeholder entry. Before launch this must be replaced with the name of a real, identifiable person responsible for the site, with a link to a profile that corroborates it.',
+  worksFor: { '@id': ORGANIZATION_ID },
+  url: `${SITE.url}${localeUrl(locale, '/about')}`,
+};
+---
+
+<BaseLayout
+  title={t('about.title')}
+  description="Who runs CycladesGo, what the site is not, how AI is used for prose but never for times, fares or coordinates, and how to report a problem or get in touch."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([{ name: 'Home', path: '/' }, { name: 'About', path }]),
+    personNode,
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('about.title')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('about.title')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      CycladesGo is a small, independent project. It is a family of free planners for island buses,
+      plus this site, which explains where the data comes from and what it cannot do. This page is
+      about who is behind it and, just as importantly, what it is not.
+    </p>
+
+    <section aria-labelledby="who" class="mt-12">
+      <SectionHeading id="who">Who builds it</SectionHeading>
+      <div class="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-cube)]">
+        <dl class="grid gap-x-6 gap-y-3 sm:grid-cols-[minmax(0,8rem)_1fr]">
+          <dt class="text-sm font-medium text-[var(--color-muted)]">Name</dt>
+          <dd class="text-sm text-[var(--color-ink)]">
+            <span class="rounded-[var(--radius-sm)] bg-[var(--color-sun-bg)] px-2 py-1 font-semibold text-[var(--color-sun-ink)]">
+              {maintainer.name}
+            </span>
+          </dd>
+          <dt class="text-sm font-medium text-[var(--color-muted)]">GitHub</dt>
+          <dd class="text-sm text-[var(--color-ink)]">
+            <span class="tabular rounded-[var(--radius-sm)] bg-[var(--color-sun-bg)] px-2 py-1 font-semibold text-[var(--color-sun-ink)]">
+              {maintainer.handle}
+            </span>
+          </dd>
+          <dt class="text-sm font-medium text-[var(--color-muted)]">Role</dt>
+          <dd class="text-sm text-[var(--color-ink)]">{maintainer.role}</dd>
+        </dl>
+
+        <p class="mt-5 border-t border-[var(--color-border)] pt-4 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+          Those two fields are deliberately empty and deliberately visible, because a real name is
+          required before this site goes live. Two separate things demand it. The first is the
+          imprint: Greek and EU law require the name and contact details of the service provider to
+          be easily, directly and continuously accessible, and a
+          <code class="tabular">TODO</code> string is not a service provider. The second is the
+          quality of the content itself. A page about how a timetable is sourced is asking to be
+          believed, and an anonymous project asking for that belief has not earned it. Both the
+          JSON-LD on this page and the imprint will carry the same named person once it exists.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="not" class="mt-14">
+      <SectionHeading id="not">What this is not</SectionHeading>
+      <ul class="mt-5 space-y-3">
+        {
+          notThis.map((item) => (
+            <li class="flex gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+              <Icon name="unofficial" size={18} class="mt-0.5 shrink-0 text-[var(--color-muted)]" />
+              <p class="text-sm leading-relaxed text-[var(--color-ink-soft)]">{item}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="prose-measure mt-4 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        CycladesGo is a commercial project: it takes sponsorship and donations to pay for hosting, the
+        data refresh and the domain. Being commercial makes it a trader in law, which is why the
+        sponsorship policy, the terms of use and the accessibility statement exist as real documents
+        rather than as a paragraph at the bottom of a page. Sponsorship buys advertising placement
+        and nothing else — see
+        <a href={localeUrl(locale, '/sponsors')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+          the sponsorship policy</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="ai" class="mt-14">
+      <SectionHeading id="ai">How AI is used here</SectionHeading>
+      <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <p>
+          We use language models as drafting tools for written content, and we say so rather than
+          hoping nobody notices. In practice that means first drafts, restructurings, headings,
+          summaries and consistency passes on prose, including prose on this page.
+        </p>
+        <p>
+          What is not drafted by a model: the numbers, the timetables, the fares, the stop
+          coordinates, the validity dates and the changelog. Those come from operators, from
+          OpenStreetMap, and from hand verification. A model is not asked to produce a departure time
+          and no departure time on this site was ever produced by one.
+        </p>
+        <p>
+          Everything published is read by a person before it goes out, and a person is accountable
+          for it. The tests for anything factual are the source and the date, not how confident the
+          text sounds. Where we cannot verify a claim, we publish the limit rather than the claim —
+          that is the entire reason the
+          <a href={localeUrl(locale, '/data/quality')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+            known-limits page</a> reads the way it does.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="why" class="mt-14">
+      <SectionHeading id="why">Why it exists</SectionHeading>
+      <div class="prose-measure mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <p>
+          Because island bus timetables are published as images, PDFs and phone numbers, and because
+          the moment you most need them is the moment your phone has no signal, is flat or is out of
+          battery. A planner that installs once and works on a bus with no coverage solves a small
+          problem that everybody who has visited these islands has had.
+        </p>
+        <p>
+          The second reason is that the same answer works badly. Somebody asking an assistant
+          "when is the last bus from Apollon" is usually told a time that was scraped from a five-year
+          old page. This site exists partly to be a source that can be cited properly: dated,
+          attributed, and explicit about what it does not know.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="contact" class="mt-14">
+      <SectionHeading id="contact">Getting in touch</SectionHeading>
+      <ul class="mt-5 grid gap-4 sm:grid-cols-2">
+        <li>
+          <Card as="article" class="h-full">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-[var(--color-ink)]">
+              <Icon name="warning" size={16} class="shrink-0 text-[var(--color-sun-ink)]" />
+              A timetable is wrong
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+              Use the report form, which reaches the same inbox. Reports that change a published
+              number end up in the changelog, dated.
+            </p>
+            <a
+              href={localeUrl(locale, '/report')}
+              class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
+            >
+              {t('footer.report')}
+              <Icon name="arrow-right" size={14} />
+            </a>
+          </Card>
+        </li>
+        <li>
+          <Card as="article" class="h-full">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-[var(--color-ink)]">
+              <Icon name="heart" size={16} class="shrink-0 text-[var(--color-bougainvillea)]" />
+              Sponsor or support
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+              Hosting, the data refresh and the domain are paid for. Sponsorship buys placement and
+              nothing else.
+            </p>
+            <a
+              href={localeUrl(locale, '/sponsors')}
+              class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-bougainvillea)] no-underline hover:underline"
+            >
+              {t('sponsors.title')}
+              <Icon name="arrow-right" size={14} />
+            </a>
+          </Card>
+        </li>
+      </ul>
+
+      <div class="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+        <p class="text-sm leading-relaxed text-[var(--color-ink-soft)]">
+          E-mail: <a class="font-medium text-[var(--color-aegean)] underline underline-offset-2" href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+          This address is a placeholder in the current build. The real one is set before launch and
+          is the address named in the
+          <a href={localeUrl(locale, '/legal')} class="underline underline-offset-2"> imprint</a>.
+          We answer e-mail, not a support queue, and we cannot help with a specific bus on a specific
+          afternoon — for that, phone the operator.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="corrections" class="mt-14">
+      <SectionHeading id="corrections">Corrections</SectionHeading>
+      <p class="prose-measure mt-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        We have been wrong in published ways that mattered: a destination label on Naxos that took
+        the island offline, and two stops on Paros placed at the wrong coordinates. Both are written
+        up with dates in the
+        <a href={localeUrl(locale, '/data/changelog')} class="font-medium text-[var(--color-aegean)] underline underline-offset-2">
+          changelog</a>, and the fixes are described there as well. If you find another, we will
+        publish it too, including the ones that make us look bad.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

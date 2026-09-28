@@ -1,0 +1,177 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalLayout from '../../../layouts/LegalLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import { SITE } from '../../../data/site';
+import { LOCALES } from '../../../i18n/utils';
+import { resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const dateModified = '2026-09-28';
+
+const features = [
+  'A skip link is the first tab stop on every page, and it moves focus to the main content.',
+  'Focus is always visible. A three-pixel outline is drawn on every focusable element and is never removed, and the focus ring is never suppressed except for pointer interaction.',
+  'Every page declares its language on the html element, and the language for the page is the language of the text you are reading rather than a default.',
+  'Landmarks are used: one header, one main element per page, one footer, and labelled navigation regions, so a screen reader user can move between them directly.',
+  'Heading levels do not skip. Each page has exactly one h1, and every section heading follows the level above it.',
+  'Text alternatives are provided for informative images. Decorative icons are hidden from assistive technology rather than read out as noise.',
+  'Colour is never the only carrier of meaning. Status, warnings and the freshness of a dataset are also stated in words.',
+  'Animation is suppressed for visitors who have asked for reduced motion at the operating system level, and the site does not rely on animation to convey anything.',
+  'Every interactive control is reachable and operable by keyboard, including the language menu, the theme toggle and the mobile navigation.',
+  'Data tables carry captions and header cells, so they are navigable by row and column rather than being read as a wall of text.',
+  'The layout reflows to a 320-pixel viewport without horizontal scrolling of the page itself, and content is not lost when a font size is increased.',
+];
+
+const limitations = [
+  {
+    item: 'The map in the island planners has only a partial text equivalent',
+    detail:
+      'The map is the primary wayfinding surface in a planner, and it conveys position and route visually. We provide a text equivalent of the result — an ordered list of the stops, the legs, the departure and arrival times and the fare — and a list of every line on the island, but that list is not an equivalent experience: it does not tell you the shape of the route or where a stop sits in relation to another. Anyone who cannot use the map is getting a usable answer and not a complete one.',
+    affects: 'Island planners, map view.',
+  },
+  {
+    item: 'Some map tiles are served by a third party',
+    detail:
+      'Tiles in the planners are cached with the application so that the map works with no signal, but the base tiles were originally obtained from a third-party tile service. A first fetch may contact that service, which is outside our control and outside this notice. The claim that the planner works entirely offline is true only after that first fetch, and only for tiles already cached.',
+    affects: 'Island planners, first use of the map.',
+  },
+  {
+    item: 'Long data tables are difficult on small screens',
+    detail:
+      'The provenance, limits and retention tables have five columns and are wider than a phone screen. They scroll horizontally inside their own container rather than reflowing, and the row header stays visible. This is a compromise: a stacked card layout is friendlier, but it is harder to compare rows across columns, which is what these tables are for. We have not tested this properly with assistive technology and do not claim that it works well.',
+    affects: 'Provenance, known limits, retention and changelog tables.',
+  },
+  {
+    item: 'No external audit has been carried out',
+    detail:
+      'The statement on this page is a self-assessment against the success criteria, written by the people who built the thing. We have tested with a keyboard, with browser zoom at 200 percent, with a screen reader in one configuration, and against a contrast checker. We have not had a formal audit by an independent accessibility specialist, we have not tested with a broad range of assistive technologies, and we have not tested with disabled users. Treat this page as a statement of intent backed by partial testing, not as a conformance claim that survives scrutiny.',
+    affects: 'The whole site.',
+  },
+  {
+    item: 'Translations are not yet reviewed for accessibility',
+    detail:
+      'The interface is available in five languages. Long-form editorial content exists in English only so far, and a locale with no reviewed translation is excluded from the language cluster rather than published unreviewed. Greek text in particular is longer than its English source in several places, which we have not yet tested for reflow.',
+    affects: 'Non-English locales.',
+  },
+];
+---
+
+<LegalLayout
+  title="Accessibility statement"
+  description="Our WCAG 2.2 AA target, what has been implemented, an honest list of known limitations including the map partial text equivalent, and how to report a barrier."
+  locale={locale}
+  path="/legal/accessibility"
+  dateModified={dateModified}
+  icon="globe"
+>
+  <h2 class="text-lg font-semibold text-[var(--color-ink)]">Summary</h2>
+  <p>
+    CycladesGo aims to conform to the Web Content Accessibility Guidelines 2.2 at level AA. This
+    statement was prepared by the project maintainers, not by an independent auditor, and a formal
+    audit has not been carried out. The known limitations below are real and we would rather list them
+    than hide them.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Why this is a duty and not a choice</h2>
+  <p>
+    The European Accessibility Act applies to products and services offered on the market, and it
+    applies to e-commerce services. CycladesGo is a commercial project: it takes sponsorship and
+    donations, it is a trader for the purposes of Greek consumer law, and it is therefore in scope.
+    A purely non-commercial publication would not be, on the same reasoning that excludes many blogs
+    and personal sites.
+    <span class="text-[var(--color-muted)]">
+      The EAA was adopted in Greece by Law 5029/2025, which brings micro-enterprise service providers
+      into compliance from 28 June 2026; the obligations for other providers applied from 28 June
+      2025.</span
+    >
+    Separate from that, a public transport information service that is unusable to somebody is not
+    doing its job, whatever the law says.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Accessibility features of this site</h2>
+  <ul class="space-y-2">
+    {
+      features.map((item) => (
+        <li class="flex gap-2.5 text-sm leading-relaxed">
+          <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
+          <span>{item}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Known limitations</h2>
+  <p>
+    These are the parts we know do not meet the target, or cannot demonstrate that they meet it. If
+    you hit any of them, the report route at the end of this page is the right one.
+  </p>
+  <ul class="mt-3 space-y-4">
+    {
+      limitations.map((item) => (
+        <li class="rounded-[var(--radius-md)] border-l-4 border-[var(--color-sun)] bg-[var(--color-sun-bg)] p-4">
+          <p class="text-sm font-semibold text-[var(--color-sun-ink)]">{item.item}</p>
+          <p class="mt-2 text-sm leading-relaxed text-[var(--color-sun-ink)]">{item.detail}</p>
+          <p class="mt-2 text-xs text-[var(--color-sun-ink)]">
+            <span class="font-semibold">Affects: </span>
+            {item.affects}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">How we evaluated this</h2>
+  <p>
+    We have tested with keyboard only, at browser zoom of 200 percent and text spacing overrides, in
+    both the light and the dark theme, and with one screen reader configuration. We have checked
+    colour contrast of the text and interactive components against the design tokens used by both
+    themes. We have checked heading order, landmark structure, form labelling, table semantics and
+    keyboard reachability page by page.
+  </p>
+  <p>
+    We have not used a broad matrix of browsers and assistive technologies, we have not run an
+    automated audit tool across the built site, and we have not tested with disabled users. A
+    conformant result claimed on that basis would be a weaker claim than we are making here, which
+    is: we have built to the target, we have checked the obvious things, and we know what is missing.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Reporting a barrier</h2>
+  <p>
+    If any part of this site is difficult or impossible for you to use, please tell us. Include the
+    page, what you were trying to do, and what happened instead. An e-mail is best, and you do not
+    need to explain your diagnosis or justify the request.
+  </p>
+  <p>
+    <a class="underline" href={`mailto:${SITE.email}?subject=Accessibility%20barrier`}>
+      {SITE.email}</a>
+    with <code class="tabular">Accessibility barrier</code> in the subject line. In the current build
+    that address is a placeholder; the real one is published in the
+    <a class="underline" href="/legal">imprint</a> before launch.
+  </p>
+  <p>
+    Target turnaround is five working days, and we will tell you if something needs longer. We aim
+    to fix a barrier within thirty days of a confirmed report, sooner where there is a workaround.
+    We accept reports in Greek, German, French, Italian or English, and we will reply in the
+    language of the report if we can.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Enforcement</h2>
+  <p>
+    If we do not resolve a barrier, you can complain to the competent national authority. In Greece
+    that is the
+    <span lang="el">Γενική Διεύθυνση Δημόσιας Πολιτικής Προστασίας Δεδομένων</span>, the General
+    Directorate for Public Data Protection, which supervises compliance with the accessibility
+    legislation. We will always try to resolve a report directly first, but that is our preference
+    and not a condition of your right to complain.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Status of this statement</h2>
+  <p>
+    <span class="tabular">Date last updated: {dateModified}</span>. This statement is reviewed
+    whenever a significant change is made to the site, and the date above is the date of that review
+    rather than the date the site was built. A formal external audit is planned and has not been done.
+  </p>
+</LegalLayout>

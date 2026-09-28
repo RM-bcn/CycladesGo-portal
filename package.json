@@ -1,0 +1,36 @@
+{
+  "name": "cycladesgo-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CycladesGo — the apex portal for the CycladesGo island bus planner family. Marketing, SEO/GEO and content hub.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/check-publishable.mjs && tsx scripts/generate-seo.ts && astro build && tsx scripts/audit-seo.ts",
+    "preview": "astro preview",
+    "check": "astro check",
+    "audit:seo": "tsx scripts/audit-seo.ts",
+    "generate:seo": "tsx scripts/generate-seo.ts",
+    "test": "vitest run",
+    "assets": "tsx scripts/generate-assets.ts"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^5.12.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@fontsource-variable/ibm-plex-sans": "^5.2.5",
+    "@fontsource/ibm-plex-mono": "^5.2.5",
+    "sharp": "^0.35.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,32 @@
+MIT License — the source code in this repository.
+
+Note on scope: this licence covers the code only. The transit data this site
+publishes is not covered by it. Data terms are set out in NOTICE (our curation
+is CC-BY 4.0; parts derived from OpenStreetMap are under ODbL 1.0, which
+carries its own share-alike obligation), and the dataset terms for the engine
+repository's data files are in that repository's LICENSE-DATA. Operator
+schedules, stop names, route numbers and fares are factual data from each
+operator's own published material and are used as facts, in our own
+presentation.
+
+MIT License
+
+Copyright (c) 2026 CycladesGo contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

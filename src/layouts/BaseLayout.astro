@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import ThemeInit from '../components/ThemeInit.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../data/site';
+import { useTranslations } from '../i18n/ui';
+import { localeUrl, type Locale } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  pathname: string;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+  hreflangLocales: Locale[];
+  noindex?: boolean;
+  dateModified?: string;
+}
+
+const { locale, noindex, title, description, pathname, jsonLd, hreflangLocales, dateModified } =
+  Astro.props;
+const t = useTranslations(locale);
+const authorUrl = new URL(localeUrl(locale, '/about'), SITE.url).href;
+---
+
+<!doctype html>
+<html lang={locale} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <ThemeInit />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- E-E-A-T: a named-author URL on every page, not just articles. -->
+    <link rel="author" href={authorUrl} />
+    <Seo
+      title={title}
+      description={description}
+      locale={locale}
+      pathname={pathname}
+      jsonLd={jsonLd}
+      hreflangLocales={hreflangLocales}
+      noindex={noindex}
+      dateModified={dateModified}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('nav.skip')}</a>
+    <SiteHeader locale={locale} pathname={pathname} />
+    {
+      /* An untranslated page is served so a visitor never hits a dead end, but it
+         is noindexed and carries no hreflang — see Seo.astro. Say so plainly
+         rather than letting a Greek reader think this is the Greek article. */
+      !hreflangLocales.includes(locale) && (
+        <div
+          role="status"
+          class="border-b border-[var(--color-sun)] bg-[var(--color-sun-bg)] px-4 py-2.5 text-center text-xs leading-relaxed text-[var(--color-sun-ink)] sm:px-6"
+        >
+          {t('common.notTranslated')}
+        </div>
+      )
+    }
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+  </body>
+</html>

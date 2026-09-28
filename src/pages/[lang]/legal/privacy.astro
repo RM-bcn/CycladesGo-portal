@@ -1,0 +1,282 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalLayout from '../../../layouts/LegalLayout.astro';
+import { SITE } from '../../../data/site';
+import { LOCALES } from '../../../i18n/utils';
+import { resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const dateModified = '2026-09-28';
+
+const purposes = [
+  {
+    purpose: 'Measuring how many people read a page, in aggregate',
+    basis: 'Article 6(1)(f) GDPR — legitimate interests',
+    data: 'Server request logs: IP address, user agent, requested URL, timestamp. Shortened or anonymised at the edge before storage.',
+    why: 'To know which pages are useful and which are not. A page nobody opens cannot be improved, and a bus timetable nobody reads is worse than useless.',
+    notDone: 'No cross-page tracking, no advertising identifiers, no profiles, no sharing with advertising networks.',
+  },
+  {
+    purpose: 'Answering a report or an e-mail about the timetable or the data',
+    basis: 'Article 6(1)(b) GDPR — steps taken at your request prior to entering into a contract',
+    data: 'The e-mail address you used, the contents of your message, and anything you attach.',
+    why: 'To be able to check a report against the operator, and to reply to you.',
+    notDone: 'Your message is not used for marketing, is not added to a mailing list, and is not shared with anyone except the operator we need to check with.',
+  },
+  {
+    purpose: 'Running the site, and keeping it available',
+    basis: 'Article 6(1)(f) GDPR — legitimate interests',
+    data: 'The same request logs, plus any error output from the build and the host.',
+    why: 'To keep the site up and to fix what breaks.',
+    notDone: 'No cookies, no local storage beyond your own theme preference, no fingerprinting.',
+  },
+];
+
+const retention = [
+  {
+    item: 'Raw server request logs',
+    period: '30 days',
+    why: 'Enough to investigate an outage or an abuse report, and no longer.',
+  },
+  {
+    item: 'Anonymised aggregate traffic reports',
+    period: '13 months',
+    why: 'Enough to see a seasonal pattern, with no individual request left in the data.',
+  },
+  {
+    item: 'Support and report e-mail',
+    period: '24 months',
+    why: 'Long enough to trace a reported error back to the dataset version it affected, which is what a correction needs.',
+  },
+];
+
+const rights = [
+  ['Article 15', 'Right of access', 'You can ask what personal data we hold about you. We answer within one month, free of charge.'],
+  ['Article 16', 'Right to rectification', 'You can ask us to correct data that is wrong. We correct it.'],
+  ['Article 17', 'Right to erasure', 'You can ask us to delete data. We delete it, unless we are required to keep it.'],
+  ['Article 18', 'Right to restriction of processing', 'You can ask us to pause what we do with your data while a question is resolved.'],
+  ['Article 19', 'Right to notification', 'You can ask us to tell anyone we gave your data to that we have erased or corrected it.'],
+  ['Article 20', 'Right to data portability', 'You can ask for the data we hold about you in a structured, machine-readable file.'],
+  ['Article 21', 'Right to object', 'You can object to processing based on legitimate interests. We stop unless we can show a compelling reason.'],
+  ['Article 22', 'Rights relating to automated decision-making', 'Nothing on this site makes a decision about you by automated means, and nothing will without telling you first.'],
+];
+---
+
+<LegalLayout
+  title="Privacy notice"
+  description="GDPR Article 13 notice: who is the controller, the purposes and lawful basis for each, the data categories, retention periods, and your rights and complaints."
+  locale={locale}
+  path="/legal/privacy"
+  dateModified={dateModified}
+  icon="shield"
+>
+  <h2 class="text-lg font-semibold text-[var(--color-ink)]">Who is the controller</h2>
+  <p>
+    The controller of the personal data described in this notice is the operator of this website.
+    Name, registered address, VAT number and company register number are given in the
+    <a class="underline" href="/legal">imprint and identification page</a>, and are repeated in the
+    footer of every page on this site.
+  </p>
+  <p>
+    In the current build those identification fields are still marked as pending. That is deliberate
+    and visible: a privacy notice that names a controller nobody can identify is worse than one that
+    admits the field is not filled in yet. They are completed before launch.
+  </p>
+  <p>
+    <strong class="font-semibold text-[var(--color-ink)]">No data protection officer is appointed.</strong>
+    The project is small and its processing is limited to the purposes below. The contact
+    address on the <a class="underline" href="/legal">imprint page</a> acts as the privacy contact
+    and is the address to use for every request in this notice:{' '}
+    <a class="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>. In the current build that
+    address is a placeholder; the real one is published on the imprint page before launch.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">What this site does not do</h2>
+  <p>
+    There are no cookies. There is no consent banner, because there is nothing to consent to. There
+    is no advertising network, no analytics script running in your browser, no advertising
+    identifier, no cross-site tracking, and no fingerprinting of any kind. Nothing about you is
+    attached to the sponsored content on this site, and no sponsor can see who read it.
+  </p>
+  <p>
+    The single value stored in your browser is your light or dark theme choice, under the key
+    <code class="tabular">cg-theme</code>, in local storage. It never leaves your device and it is
+    deleted when you clear site data. The
+    <a class="underline" href="/legal/cookies">cookies page</a> sets out the whole position.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Purposes and lawful bases</h2>
+  <p>
+    We process personal data for three purposes, and only these three. The lawful basis is given for
+    each, under Article 6(1) GDPR.
+  </p>
+  <dl class="mt-2 space-y-4">
+    {
+      purposes.map((item) => (
+        <div class="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <dt class="text-sm font-semibold text-[var(--color-ink)]">{item.purpose}</dt>
+          <dd class="mt-2 text-sm leading-relaxed">
+            <p>
+              <span class="font-semibold text-[var(--color-ink)]">Lawful basis: </span>
+              {item.basis}
+            </p>
+            <p class="mt-2">
+              <span class="font-semibold text-[var(--color-ink)]">Data: </span>
+              {item.data}
+            </p>
+            <p class="mt-2">
+              <span class="font-semibold text-[var(--color-ink)]">Why: </span>
+              {item.why}
+            </p>
+            <p class="mt-2">
+              <span class="font-semibold text-[var(--color-ink)]">Not done: </span>
+              {item.notDone}
+            </p>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+  <p>
+    We do not rely on consent as a lawful basis for anything. There is no consent to withdraw,
+    because no consent is collected.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Categories of data</h2>
+  <p>
+    Network and log data: your IP address at the time of the request, your browser and device
+    identifiers as sent in the request, the page requested, and the timestamp. Content data: the
+    text of any e-mail you send us and anything you attach to it, which may include your name and
+    details about a journey you took.
+  </p>
+  <p>
+    We do not collect or hold special categories of data under Article 9. If your message happens
+    to include information about your health, your religion or your political opinions, please do
+    not send it, and tell us so that we can delete it.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Recipients and processors</h2>
+  <p>
+    The site is hosted on Vercel. Vercel processes the request data on our behalf as a processor,
+    under a data processing agreement. It is the only processor that handles personal data from this
+    site.
+  </p>
+  <p>
+    Email is handled through a mail provider, also as a processor. The domain and DNS are handled by
+    a registrar and a DNS provider, both as processors.
+  </p>
+  <p>
+    Where a report requires it, we may contact the operator concerned — for example KTEL Naxos when
+    a Naxos time is reported wrong — in order to check it. That disclosure is limited to the fact in
+    question. We do not sell data, share it for advertising, or make it available to any sponsor.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">International transfers</h2>
+  <p>
+    Vercel is a company established in the United States, and its infrastructure is in the United
+    States. Transferring the request data there is a transfer to a third country for the purposes
+    of Chapter V GDPR.
+  </p>
+  <p>
+    <span
+      class="rounded-[var(--radius-sm)] bg-[var(--color-sun-bg)] px-1.5 py-0.5 font-semibold text-[var(--color-sun-ink)]"
+      >TODO before launch</span
+    >: the transfer mechanism relied on is not yet confirmed and is not stated here. On our present
+    understanding it will be the EU-US Data Privacy Framework for certified US recipients, backed by
+    standard contractual clauses for anything outside it, with a transfer impact assessment on file.
+    This paragraph will state the mechanism, the recipient and the assessment date. It is not
+    written in the meantime because a notice that names a safeguard we have not verified is worse
+    than one that admits the gap.
+  </p>
+  <p>
+    No other transfer outside the European Economic Area takes place. The planners themselves are
+    static applications with no backend: once the code and timetable are downloaded, nothing you do
+    in them is sent anywhere.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">How long we keep it</h2>
+  <div class="mt-2 overflow-x-auto">
+    <table class="w-full min-w-[28rem] border-collapse text-left text-sm">
+      <caption class="sr-only">Retention periods for each category of personal data</caption>
+      <thead>
+        <tr class="border-b border-[var(--color-border)] text-xs uppercase tracking-wide text-[var(--color-muted)]">
+          <th scope="col" class="py-2 pr-4 font-semibold">What</th>
+          <th scope="col" class="py-2 pr-4 font-semibold">How long</th>
+          <th scope="col" class="py-2 font-semibold">Why that long</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          retention.map((row) => (
+            <tr class="border-b border-[var(--color-border)] align-top">
+              <th scope="row" class="py-2.5 pr-4 font-semibold text-[var(--color-ink)]">
+                {row.item}
+              </th>
+              <td class="tabular py-2.5 pr-4 text-[var(--color-ink-soft)]">{row.period}</td>
+              <td class="py-2.5 text-[var(--color-ink-soft)]">{row.why}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-3">
+    When a period ends, the data is deleted or irreversibly anonymised. The planners hold no user
+    data at all, because they have no accounts and no server-side component.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Your rights</h2>
+  <p>
+    You have the following rights under the GDPR. Write to the contact address on the
+    <a class="underline" href="/legal">imprint page</a> and we will answer within one month.
+  </p>
+  <dl class="mt-2 space-y-2.5">
+    {
+      rights.map(([article, title, body]) => (
+        <div class="flex flex-col gap-1 sm:flex-row sm:gap-3">
+          <dt class="tabular shrink-0 text-sm font-semibold text-[var(--color-ink)] sm:w-20">
+            {article}
+          </dt>
+          <dd class="text-sm leading-relaxed">
+            <span class="font-semibold text-[var(--color-ink)]">{title}. </span>
+            {body}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Right to object, in particular</h2>
+  <p>
+    Article 21 gives you the right to object at any time, on grounds relating to your particular
+    situation, to processing based on Article 6(1)(e) or 6(1)(f) — which is what both measurement and
+    the running of the site rest on. We will stop processing unless we can demonstrate compelling
+    legitimate grounds that override your interests, rights and freedoms, or unless the processing
+    serves the establishment, exercise or defence of legal claims.
+  </p>
+  <p>
+    We do not use profiling, automated decision-making or targeted advertising, so there is no
+    separate right to object to profiling here. That is a deliberate design decision, not an
+    oversight, and it is why this notice can be this short.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Right to complain</h2>
+  <p>
+    You may complain to the Hellenic Data Protection Authority
+    (<span lang="el">Αρχή Προστασίας Προδοσιακών Δεδομένων</span>) at
+    <a class="underline" href="https://www.dpa.gr" rel="noopener">dpa.gr</a>. We would rather you
+    wrote to us first, but that is your choice and not a condition of it.
+  </p>
+
+  <h2 class="pt-4 text-lg font-semibold text-[var(--color-ink)]">Changes to this notice</h2>
+  <p>
+    If this notice changes, the date at the top of the page changes with it. The most likely reason
+    for a change is the pending transfer mechanism, which will be replaced by a specific named
+    safeguard rather than left as a gap.
+  </p>
+  <p>
+    <span class="tabular">Date last updated: {dateModified}</span>
+  </p>
+</LegalLayout>

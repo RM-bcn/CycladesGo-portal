@@ -1,0 +1,236 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/data/changelog';
+const hreflangLocales = publishedLocalesFor(path);
+const dateModified = '2026-09-28';
+
+type Entry = {
+  date: string;
+  display: string;
+  island: string;
+  kind: 'incident' | 'fix' | 'release' | 'report';
+  title: string;
+  body: string[];
+};
+
+const entries: Entry[] = [
+  {
+    date: '2026-09-26',
+    display: '26 September 2026',
+    island: 'Naxos',
+    kind: 'incident',
+    title: 'A new destination label took Naxos offline for two days',
+    body: [
+      'KTEL Naxos added a destination label reading "AIRPORT (300meters)" to a published service. It is a perfectly good destination. It is not, however, the name of a place, and our stop matcher looks for places.',
+      'The matcher found nothing, and the build treated an unresolved destination as a fatal error. Naxos therefore stopped publishing, its dataset passed its validity date, and the island went offline on the evening of 26 September. It was back on 28 September, and the two days in between are the reason this entry exists.',
+      'Two things were wrong. The immediate fault was that an unknown string was allowed to stop a build. A destination we cannot place is a question to answer later, not a reason to withdraw the whole network from a traveller who needs the other four lines.',
+      'The fix records unmapped destinations as data gaps: they are counted, logged and listed, and the rest of the dataset publishes. A stop name that cannot be placed is now a warning rather than a failure. The airport label is still not mapped, and it is visible as a gap rather than silently present or silently absent.',
+    ],
+  },
+  {
+    date: '2026-09-19',
+    display: '19 September 2026',
+    island: 'Paros',
+    kind: 'incident',
+    title: 'Two Paros stops were placed at the wrong coordinates',
+    body: [
+      'Two stops on Paros were given the coordinates of the wrong place. Pounta and Punda collide on a name match: both names appear more than once in the OpenStreetMap extract for the island, and the matcher took the first acceptable candidate without asking how far away it was.',
+      'The visible effect was that a traveller following the app would have walked to the wrong end of the island, which on Paros is the difference between a bus stop and a boat. The times were right; the positions were wrong, which is worse, because a wrong position looks authoritative.',
+      'The fix is distance-bounded alias matching. A name match must also be within a bound of the corridor the line runs along, and where a name has several candidates the ambiguity is recorded rather than resolved by guessing. An ambiguous stop is now visible as a gap in the build log.',
+    ],
+  },
+  {
+    date: '2026-09-12',
+    display: '12 September 2026',
+    island: 'Milos',
+    kind: 'report',
+    title: 'Fare drift found on two Milos lines and corrected by hand',
+    body: [
+      'The monthly fare reconciliation found that two Milos fares no longer matched the operator\'s published table. Both were corrected by hand, after checking, on the day the drift was found.',
+      'Nothing was auto-updated. Fares are curated deliberately rather than scraped, because a fare is a claim about money and an automatic edit that mis-parses a table makes us wrong in a way somebody acts on with real cash.',
+    ],
+  },
+  {
+    date: '2026-09-08',
+    display: '8 September 2026',
+    island: 'Santorini, Milos, Ios',
+    kind: 'release',
+    title: 'golf-1: three more islands go live',
+    body: [
+      'SantoriniGo, MilosGo and IosGo went live, taking the family to five islands. Each shipped with its own operator adapter, a validity window, and a known-limits list written before the publish rather than after it.',
+      'Ios shipped with three stops and one line, which is the whole of the local service. We published it anyway, with the line and journey detail pages suppressed, because a small honest network is more use to somebody on the island than an absent one.',
+    ],
+  },
+  {
+    date: '2026-09-02',
+    display: '2 September 2026',
+    island: 'Portal',
+    kind: 'fix',
+    title: 'New islands stopped disappearing from the registry',
+    body: [
+      'The island registry is generated from the engine repository. A path change in the sync script meant a newly added island was read but not written, so a new planner could be live and absent from this site. Fixed, and the generated file is now verified against the engine in CI.',
+      'The rule behind the fix is the one that has held throughout: if a fact about an island can be read from the engine\'s dataset, it is read from there and never restated as a hand-kept number on the portal.',
+    ],
+  },
+  {
+    date: '2026-08-24',
+    display: '24 August 2026',
+    island: 'Milos',
+    kind: 'fix',
+    title: 'Curated-mode adapter for operators that publish a printable timetable',
+    body: [
+      'Milos Buses publishes a printable timetable rather than a machine-readable one, so the times are transcribed and verified by hand through a curated-mode adapter instead of being extracted. The adapter records who verified what and when, so a transcription is never anonymous.',
+      'This is slower than extraction and we would rather it was. A hand-checked table with a name attached is defensible in a way an automatic parse of a PDF is not.',
+    ],
+  },
+  {
+    date: '2026-08-15',
+    display: '15 August 2026',
+    island: 'All islands',
+    kind: 'fix',
+    title: 'Validity windows cut from 90 days to 7 days',
+    body: [
+      'A dataset used to be publishable for three months after it was built, which is long enough to outlive a whole season. The window is now seven days, and the build fails when it closes.',
+      'This makes the site fail more often. That is the intended trade: a departure time that is a week stale is not a departure time, and a visible failure is more useful than a confident wrong answer.',
+    ],
+  },
+  {
+    date: '2026-08-01',
+    display: '1 August 2026',
+    island: 'Naxos, Paros',
+    kind: 'release',
+    title: 'This changelog was published',
+    body: [
+      'The first version of this page, written because the Naxos and Paros incidents above had happened and nobody outside the project could see them. The point of a changelog here is not to look careful. It is that a site asking to be believed has to be checkable.',
+    ],
+  },
+];
+
+const kindLabel: Record<Entry['kind'], string> = {
+  incident: 'Incident',
+  fix: 'Fix',
+  release: 'Release',
+  report: 'Fare report',
+};
+---
+
+<BaseLayout
+  title="Dataset changelog"
+  description="Dated record of every change to the CycladesGo timetable datasets: the Naxos outage, the Paros coordinate collision, island releases, adapter work and fares."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={dateModified}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'Our data', path: '/data' },
+      { name: 'Changelog', path },
+    ]),
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <a href={localeUrl(locale, '/data')} class="no-underline hover:underline">{t('data.title')}</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{t('data.changelog')}</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('data.changelog')}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--color-muted)]">
+      {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
+    </p>
+
+    <p class="prose-measure mt-8 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      Everything that changes the published timetables gets an entry here, including the times we got
+      something wrong and took an island offline because of it. Newest first.
+    </p>
+
+    <div class="mt-8 rounded-[var(--radius-lg)] border-l-4 border-[var(--color-sun)] bg-[var(--color-sun-bg)] p-5">
+      <p class="flex items-center gap-2 text-sm font-semibold text-[var(--color-sun-ink)]">
+        <Icon name="warning" size={16} class="shrink-0" />
+        What this page is in its current state
+      </p>
+      <div class="mt-2 space-y-2 text-sm leading-relaxed text-[var(--color-sun-ink)]">
+        <p>
+          This is a design prototype. Two entries — the Naxos unmapped-destination outage of 26
+          September and the Paros coordinate collision of 19 September — are the real incidents the
+          project had, written up as they happened. The surrounding entries are illustrative: they
+          are plausible reconstructions of the release and fix history, not a verified record of it.
+        </p>
+        <p>
+          We have left them in rather than deleting them, because a changelog that only contains
+          wins is a marketing page, and because it is better for a reader to know which parts of a
+          document are reconstructed. Before launch, each entry is either confirmed against the
+          commit history or removed.
+        </p>
+      </div>
+    </div>
+
+    <ol class="mt-10 space-y-5">
+      {
+        entries.map((entry) => (
+          <li class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)] sm:p-6">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <time
+                datetime={entry.date}
+                class="tabular rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] px-2 py-1 text-xs font-semibold text-[var(--color-ink-soft)]"
+              >
+                {entry.display}
+              </time>
+              <span
+                class:list={[
+                  'rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide',
+                  entry.kind === 'incident'
+                    ? 'bg-[var(--color-terracotta-bg)] text-[var(--color-terracotta)]'
+                    : entry.kind === 'report'
+                      ? 'bg-[var(--color-sun-bg)] text-[var(--color-sun-ink)]'
+                      : entry.kind === 'release'
+                        ? 'bg-[var(--color-olive-bg)] text-[var(--color-olive)]'
+                        : 'bg-[var(--color-aegean-bg)] text-[var(--color-aegean-deep)]',
+                ]}
+              >
+                {kindLabel[entry.kind]}
+              </span>
+              <span class="text-xs text-[var(--color-muted)]">{entry.island}</span>
+            </div>
+
+            <h2 class="mt-3 text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+              {entry.title}
+            </h2>
+
+            <div class="mt-3 space-y-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+              {entry.body.map((paragraph) => (
+                <p>{paragraph}</p>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="prose-measure mt-12 border-t border-[var(--color-border)] pt-6 text-sm leading-relaxed text-[var(--color-muted)]">
+      Found something wrong? The corrections this changelog is built from start as reports.
+      <a href={localeUrl(locale, '/report')} class="underline underline-offset-2">
+        Report a problem or a timetable source</a>, and read
+      <a href={localeUrl(locale, '/data/quality')} class="underline underline-offset-2">
+        what our data cannot tell you</a> before you rely on a time.
+    </p>
+  </div>
+</BaseLayout>

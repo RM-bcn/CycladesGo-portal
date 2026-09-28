@@ -1,0 +1,131 @@
+---
+import Icon from './ui/Icon.astro';
+import type { IslandEntry } from '../data/islands';
+
+interface Props {
+  island: IslandEntry;
+  /** `inline` sits under a table; `block` is a full disclosure panel. */
+  variant?: 'inline' | 'block';
+  /** ISO date of the operator snapshot the page is rendered from. */
+  retrieved: string;
+  /** ISO date the dataset is verified until, or null when unknown. */
+  validTo: string | null;
+  class?: string;
+}
+
+const { island, variant = 'inline', retrieved, validTo, class: className = '' } = Astro.props;
+const { operator } = island;
+const hasPhone = Boolean(operator.phone);
+const telHref = hasPhone ? `tel:${operator.phone?.replace(/[^+\d]/g, '')}` : null;
+---
+
+{
+  variant === 'inline' ? (
+    <p
+      class={`flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-[var(--color-muted)] ${className}`}
+    >
+      <span>
+        Operator: <strong class="font-medium text-[var(--color-ink-soft)]">{operator.name}</strong>
+        {' · '}
+        <a
+          href={operator.site}
+          rel="nofollow noopener"
+          target="_blank"
+          class="underline underline-offset-2 hover:text-[var(--color-aegean)]"
+        >
+          official timetable
+        </a>
+      </span>
+      <span aria-hidden="true">·</span>
+      <span class="tabular">retrieved {retrieved}</span>
+      {validTo && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span class="tabular">verified until {validTo}</span>
+        </>
+      )}
+      {hasPhone && (
+        <>
+          <span aria-hidden="true">·</span>
+          <a href={telHref!} class="tabular underline underline-offset-2 hover:text-[var(--color-aegean)]">
+            {operator.phone}
+          </a>
+        </>
+      )}
+    </p>
+  ) : (
+    <aside
+      aria-labelledby={`opattr-${island.id}`}
+      class={`rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 ${className}`}
+    >
+      <h3
+        id={`opattr-${island.id}`}
+        class="flex items-center gap-2 text-sm font-semibold text-[var(--color-ink)]"
+      >
+        <Icon name="shield" size={16} />
+        What this data is, and what it is not
+      </h3>
+      <ul class="mt-3 space-y-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        <li class="flex gap-2">
+          <span class="text-[var(--color-olive)]" aria-hidden="true">✓</span>
+          <span>
+            Operator: <strong class="font-medium text-[var(--color-ink)]">{operator.name}</strong>
+            {operator.nameEl ? ` (${operator.nameEl})` : ''}. Source:{' '}
+            <a
+              href={operator.site}
+              rel="nofollow noopener"
+              target="_blank"
+              class="font-medium text-[var(--color-aegean)] underline underline-offset-2"
+            >
+              the operator's own site
+            </a>
+            .
+          </span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-[var(--color-olive)]" aria-hidden="true">✓</span>
+          <span class="tabular">
+            Data retrieved <strong class="font-medium text-[var(--color-ink)]">{retrieved}</strong>
+            {validTo && (
+              <>
+                , verified until <strong class="font-medium text-[var(--color-ink)]">{validTo}</strong>
+              </>
+            )}
+            .
+          </span>
+        </li>
+        <li class="flex gap-2">
+          <span class="mt-0.5 h-full w-4 shrink-0 text-center text-[var(--color-sun-ink)]" aria-hidden="true">
+            !
+          </span>
+          <span>
+            <strong class="font-medium text-[var(--color-ink)]">This is not a live departure board.</strong>{' '}
+            We publish the operator's printed schedule. There is no real-time vehicle feed, and we
+            cannot tell you whether a bus is running late.
+          </span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-[var(--color-sun-ink)]" aria-hidden="true">!</span>
+          <span>
+            Timetables change without notice. Seasonal, engineering-work and event changes are not
+            always reflected here. Confirm before you travel.
+          </span>
+        </li>
+        {hasPhone && (
+          <li class="flex gap-2">
+            <span class="text-[var(--color-olive)]" aria-hidden="true">✓</span>
+            <span>
+              Check with the operator:{' '}
+              <a
+                href={telHref!}
+                class="tabular font-medium text-[var(--color-aegean)] underline underline-offset-2"
+              >
+                {operator.phone}
+              </a>
+            </span>
+          </li>
+        )}
+      </ul>
+    </aside>
+  )
+}

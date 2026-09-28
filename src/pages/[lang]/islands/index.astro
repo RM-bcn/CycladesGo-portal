@@ -1,0 +1,141 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import TrustBanner from '../../../components/TrustBanner.astro';
+import OperatorAttribution from '../../../components/OperatorAttribution.astro';
+import InstallCTA from '../../../components/InstallCTA.astro';
+import { ISLANDS, PLANNED } from '../../../data/islands';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/islands';
+const hreflangLocales = publishedLocalesFor(path);
+---
+
+<BaseLayout
+  title={t('islands.title')}
+  description="Every Cyclades island with a CycladesGo planner: Naxos, Paros, Santorini, Milos and Ios. Line counts, stop counts, operator names and data freshness for each."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'Islands', path: '/islands' },
+    ]),
+  ]}
+>
+  <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">Islands</span>
+    </nav>
+
+    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+      {t('islands.title')}
+    </h1>
+    <p class="prose-measure mt-3 text-lg text-[var(--color-ink-soft)]">{t('islands.lede')}</p>
+
+    <TrustBanner locale={locale} class="mt-6 max-w-3xl" />
+
+    <ul class="mt-10 space-y-4">
+      {
+        ISLANDS.map((island) => (
+          <li>
+            <article class="grid gap-6 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-cube)] sm:grid-cols-[1fr_auto] sm:items-center">
+              <div>
+                <h2 class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+                  {island.brand}{' '}
+                  <span class="text-base font-normal text-[var(--color-muted)]">
+                    — {island.name} (<span lang="el">{island.nameEl}</span>)
+                  </span>
+                </h2>
+                <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+                  {island.blurb.en}
+                </p>
+
+                <dl class="tabular mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                  <div class="flex gap-1.5">
+                    <dt class="text-[var(--color-muted)]">{t('islands.lines')}</dt>
+                    <dd class="font-semibold text-[var(--color-ink)]">{island.counts?.lines}</dd>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <dt class="text-[var(--color-muted)]">{t('islands.stops')}</dt>
+                    <dd class="font-semibold text-[var(--color-ink)]">{island.counts?.stops}</dd>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <dt class="text-[var(--color-muted)]">{t('islands.journeys')}</dt>
+                    <dd class="font-semibold text-[var(--color-ink)]">{island.counts?.journeys}</dd>
+                  </div>
+                </dl>
+
+                <div class="mt-4 border-t border-[var(--color-border)] pt-3">
+                  <OperatorAttribution
+                    island={island}
+                    retrieved={island.dataGeneratedAt ?? 'unknown'}
+                    validTo={island.dataValidTo}
+                  />
+                </div>
+
+                {island.knownLimits.length > 0 && (
+                  <ul class="mt-2 space-y-1">
+                    {island.knownLimits.map((limit) => (
+                      <li class="flex gap-1.5 text-xs leading-relaxed text-[var(--color-muted)]">
+                        <span class="text-[var(--color-sun-ink)]" aria-hidden="true">!</span>
+                        {limit}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <OperatorAttribution
+                  island={island}
+                  variant="block"
+                  retrieved={island.dataGeneratedAt ?? 'unknown'}
+                  validTo={island.dataValidTo}
+                  class="mt-4"
+                />
+              </div>
+
+              <InstallCTA island={island} variant="inline" />
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+
+    <section aria-labelledby="planned" class="mt-14">
+      <h2 id="planned" class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+        {t('islands.plannedTitle')}
+      </h2>
+      <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        {t('islands.plannedLede')}
+      </p>
+      <ul class="mt-5 flex flex-wrap gap-2">
+        {
+          PLANNED.map((island) => (
+            <li class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3.5 py-2 text-sm text-[var(--color-muted)]">
+              {island.name} <span lang="el" class="text-xs">{island.nameEl}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <a
+        href={localeUrl(locale, '/report')}
+        class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
+      >
+        {t('islands.reportSource')}
+        <Icon name="arrow-right" size={15} />
+      </a>
+    </section>
+  </div>
+</BaseLayout>
