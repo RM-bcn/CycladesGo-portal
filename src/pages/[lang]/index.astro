@@ -2,6 +2,10 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
+import Button from '../../components/ui/Button.astro';
+import Card from '../../components/ui/Card.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import DomeBadge from '../../components/ui/DomeBadge.astro';
 import TrustBanner from '../../components/TrustBanner.astro';
 import { ISLANDS, PLANNED } from '../../data/islands';
 import { SITE } from '../../data/site';
@@ -10,8 +14,7 @@ import { LOCALES, localeUrl } from '../../i18n/utils';
 import { islandListNode, organizationNode, websiteNode } from '../../lib/jsonld';
 import { publishedLocalesFor, resolveLocale } from '../../lib/page';
 
-export const getStaticPaths: GetStaticPaths = () =>
-  LOCALES.map((lang) => ({ params: { lang } }));
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
 
 const locale = resolveLocale(Astro.params.lang);
 const t = useTranslations(locale);
@@ -27,13 +30,6 @@ const totals = ISLANDS.reduce(
   { stops: 0, lines: 0, journeys: 0 },
 );
 
-const stats = [
-  { value: String(ISLANDS.length), label: t('hero.stat1') },
-  { value: String(totals.lines), label: t('hero.stat2') },
-  { value: String(totals.stops), label: t('hero.stat3') },
-  { value: String(totals.journeys), label: t('hero.stat4') },
-] as const;
-
 const jsonLd = [organizationNode(), websiteNode(), islandListNode()];
 ---
 
@@ -45,197 +41,169 @@ const jsonLd = [organizationNode(), websiteNode(), islandListNode()];
   hreflangLocales={hreflangLocales}
   jsonLd={jsonLd}
 >
-  <!-- Hero -->
-  <section class="relative overflow-hidden border-b border-[var(--color-border)]">
-    <div
-      class="pointer-events-none absolute inset-0 opacity-[0.55]"
-      style="background: radial-gradient(900px 340px at 12% -8%, var(--color-aegean-bg), transparent 62%), radial-gradient(760px 300px at 92% 4%, var(--color-sun-bg), transparent 60%);"
-      aria-hidden="true"
-    >
-    </div>
-
-    <div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-      <div class="grid items-start gap-12 lg:grid-cols-[1.15fr_1fr]">
-        <div>
-          <p
-            class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink-soft)]"
-          >
-            <Icon name="unofficial" size={13} />
-            {t('brand.subtagline')}
-          </p>
-
-          <h1
-            class="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-[var(--color-ink)] sm:text-5xl"
-            style="letter-spacing: -0.03em;"
-          >
-            {t('hero.title')}
-          </h1>
-
-          <p class="prose-measure mt-5 text-lg leading-relaxed text-[var(--color-ink-soft)]">
-            {t('hero.lede')}
-          </p>
-
-          <div class="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href={localeUrl(locale, '/islands')}
-              class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 font-semibold text-[var(--color-aegean-btn-text)] no-underline shadow-[var(--shadow-cube)] transition-colors hover:bg-[var(--color-aegean-btn-hover)]"
-            >
-              {t('hero.ctaPrimary')}
-              <Icon name="arrow-right" size={17} />
-            </a>
-            <a
-              href={localeUrl(locale, '/data/methodology')}
-              class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 font-semibold text-[var(--color-ink-soft)] no-underline transition-colors hover:bg-[var(--color-surface-2)]"
-            >
-              {t('hero.ctaSecondary')}
-              <Icon name="arrow-right" size={16} />
-            </a>
-          </div>
-
-          <TrustBanner locale={locale} class="mt-8" />
-
-          <p class="mt-4 max-w-[54ch] text-xs leading-relaxed text-[var(--color-muted)]">
-            {t('hero.trustLine')}
-          </p>
-        </div>
-
-        <!-- Stats + the honest-limit card -->
-        <div class="flex flex-col gap-4 lg:pt-10">
-          <div
-            class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-lift)]"
-          >
-            <dl class="grid grid-cols-2 gap-x-4 gap-y-6">
-              {
-                stats.map((stat) => (
-                  <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-[var(--color-muted)]">
-                      {stat.label}
-                    </dt>
-                    <dd class="tabular mt-1 text-3xl font-semibold text-[var(--color-aegean)]">
-                      {stat.value}
-                    </dd>
-                  </div>
-                ))
-              }
-            </dl>
-            <p class="mt-6 border-t border-[var(--color-border)] pt-4 text-xs leading-relaxed text-[var(--color-muted)]">
-              Every count is read from the engine dataset, never typed by hand. If a dataset
-              expires, this site stops publishing rather than showing you a stale number.
-            </p>
-          </div>
-
-          <!--
-            The honesty card is the product. A visitor deciding whether to trust a
-            stranger's bus times is the moment this site has to earn it, so the
-            commitments are stated as plainly as the feature list.
-          -->
-          <div
-            class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6"
-          >
-            <h2 class="flex items-center gap-2 text-sm font-semibold text-[var(--color-ink)]">
-              <Icon name="shield" size={16} class="text-[var(--color-olive)]" />
-              What we promise
-            </h2>
-            <ul class="mt-3 space-y-2.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">
-              {
-                [
-                  'Every time is the operator’s published schedule, with the date we retrieved it.',
-                  'Where we estimate an intermediate stop time, we label it as an estimate.',
-                  'We will tell you when we do not know, rather than fill the gap.',
-                  'We do not sell tickets, and we take no commission on your fare.',
-                ].map((line) => (
-                  <li class="flex gap-2.5">
-                    <Icon name="check" size={16} class="mt-0.5 shrink-0 text-[var(--color-olive)]" />
-                    <span>{line}</span>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </div>
+  <div class="shell-wide py-6">
+    <!-- Masthead: the engine's eyebrow + H1 + trailing rule + lede. -->
+    <section class="mb-6">
+      <p class="eyebrow">{t('hero.eyebrow')}</p>
+      <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
+        {t('hero.title')}
+        <span class="rule" aria-hidden="true"></span>
+      </h1>
+      <p class="mt-3 max-w-prose text-[var(--color-ink-soft)]">{t('hero.lede')}</p>
+      <p class="mt-2 max-w-prose text-[var(--color-ink-soft)]">{t('hero.lede2')}</p>
+      <div class="mt-5 flex flex-wrap gap-2">
+        <Button href={localeUrl(locale, '/islands')} size="lg" variant="primary">
+          {t('hero.ctaPrimary')}
+          <Icon name="arrow" size={18} />
+        </Button>
+        <Button href={localeUrl(locale, '/data/methodology')} size="lg" variant="secondary">
+          {t('hero.ctaSecondary')}
+        </Button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Islands -->
-  <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-    <div class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-3xl" style="letter-spacing: -0.02em;">
-          {t('islands.title')}
-        </h2>
-        <p class="mt-2 text-[var(--color-ink-soft)]">{t('islands.lede')}</p>
-      </div>
-      <a
+    <!-- What we publish, as a list the way the engine lists routes. -->
+    <section class="mb-8">
+      <SectionHeading
+        stripe="aegean"
+        size="lg"
         href={localeUrl(locale, '/islands')}
-        class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
+        action={t('common.readMore')}
       >
-        {t('common.readMore')}
-        <Icon name="arrow-right" size={15} />
-      </a>
-    </div>
-
-    <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {
-        ISLANDS.map((island) => (
-          <li>
-            <article class="flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)] transition-shadow hover:shadow-[var(--shadow-lift)]">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-lg font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-                    <a href={`${island.currentUrl}/en/`} rel="noopener" class="no-underline hover:underline">
-                      {island.brand}
-                    </a>
-                  </h3>
-                  <p class="text-sm text-[var(--color-muted)]">
-                    {island.name} · <span lang="el">{island.nameEl}</span>
+        {t('islands.title')}
+      </SectionHeading>
+      <ul class="flex flex-col gap-2">
+        {
+          ISLANDS.map((island) => (
+            <li>
+              <a
+                href={`${island.currentUrl}/en/`}
+                rel="noopener"
+                class="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-cube)] transition hover:shadow-[var(--shadow-lift)] no-underline"
+              >
+                <DomeBadge line={String(island.counts?.lines ?? 0)} color={island.accent} />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-semibold text-[var(--color-ink)]">
+                    {island.brand}{' '}
+                    <span class="hidden font-normal text-[var(--color-muted)] sm:inline">
+                      — {island.name} (<span lang="el">{island.nameEl}</span>)
+                    </span>
+                  </p>
+                  <p class="truncate text-xs text-[var(--color-muted)]">
+                    <span class="sm:hidden">
+                      {island.name} (<span lang="el">{island.nameEl}</span>) ·
+                    </span>
+                    {island.counts?.stops} {t('islands.stops')} · {island.counts?.journeys}{' '}
+                    {t('islands.journeys')} · {island.operator.name}
                   </p>
                 </div>
-                <span
-                  class="shrink-0 rounded-full bg-[var(--color-olive-bg)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-olive)]"
-                  title="The planner is available. The data is the operator's published schedule, not a live feed."
-                >
-                  Available
-                </span>
-              </div>
-
-              <p class="mt-3 flex-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">
-                {island.blurb.en}
-              </p>
-
-              <dl class="tabular mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-muted)]">
-                <div class="flex gap-1.5">
-                  <dt class="sr-only">{t('islands.lines')}</dt>
-                  <dd><strong class="font-semibold text-[var(--color-ink)]">{island.counts?.lines}</strong> {t('islands.lines')}</dd>
-                </div>
-                <div class="flex gap-1.5">
-                  <dt class="sr-only">{t('islands.stops')}</dt>
-                  <dd><strong class="font-semibold text-[var(--color-ink)]">{island.counts?.stops}</strong> {t('islands.stops')}</dd>
-                </div>
-                <div class="flex gap-1.5">
-                  <dt class="sr-only">{t('islands.journeys')}</dt>
-                  <dd><strong class="font-semibold text-[var(--color-ink)]">{island.counts?.journeys}</strong> {t('islands.journeys')}</dd>
-                </div>
-              </dl>
-
-              <p class="mt-3 border-t border-[var(--color-border)] pt-3 text-xs text-[var(--color-muted)]">
-                {t('islands.operator')}: {island.operator.name}
                 {island.dataValidTo && (
-                  <span class="tabular"> · {t('islands.validTo')} {island.dataValidTo}</span>
+                  <span class="tabular hidden shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-sun-bg)] px-2 py-0.5 text-xs font-medium text-[var(--color-sun-ink)] sm:inline">
+                    {t('islands.validTo')} {island.dataValidTo.slice(5)}
+                  </span>
                 )}
-              </p>
-            </article>
-          </li>
-        ))
-      }
-    </ul>
+                <Icon name="chevron" size={16} class="-rotate-90 shrink-0 text-[var(--color-muted)]" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
 
-    <div class="mt-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)] p-6">
-      <h3 class="text-base font-semibold text-[var(--color-ink)]">{t('islands.plannedTitle')}</h3>
-      <p class="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-[var(--color-ink-soft)]">
-        {t('islands.plannedLede')}
+    <TrustBanner locale={locale} class="mb-8" />
+
+    <!-- Counts, as the engine's departure board: mono numerals, plain labels. -->
+    <section class="mb-8">
+      <SectionHeading stripe="sea" size="lg">{t('data.title')}</SectionHeading>
+      <dl class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {
+          [
+            { value: ISLANDS.length, label: t('hero.stat1'), color: 'var(--color-aegean)' },
+            { value: totals.lines, label: t('hero.stat2'), color: 'var(--color-line-2)' },
+            { value: totals.stops, label: t('hero.stat3'), color: 'var(--color-line-5)' },
+            { value: totals.journeys, label: t('hero.stat4'), color: 'var(--color-sea)' },
+          ].map((stat) => (
+            <Card>
+              <dt class="text-[0.7rem] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+                {stat.label}
+              </dt>
+              <dd
+                class="tabular mt-1 text-2xl font-semibold"
+                style={`color:${stat.color}`}
+              >
+                {stat.value}
+              </dd>
+            </Card>
+          ))
+        }
+      </dl>
+      <p class="mt-3 text-xs leading-relaxed text-[var(--color-muted)]">
+        Every count is read from the engine dataset, never typed by hand. If a dataset expires, this
+        site stops publishing rather than showing you a stale number.
       </p>
-      <ul class="mt-4 flex flex-wrap gap-2">
+    </section>
+
+    <!-- Why it exists -->
+    <section class="mb-8">
+      <SectionHeading stripe="terracotta" size="lg">{t('network.title')}</SectionHeading>
+      <p class="max-w-prose text-[var(--color-ink-soft)]">{t('network.lede')}</p>
+      <ul class="mt-4 grid gap-2 sm:grid-cols-3">
+        {
+          [
+            {
+              icon: 'download',
+              title: 'It installs and it stays',
+              body: 'The planner is a PWA. Install it once on the bus or on the ferry and it opens without a signal.',
+              href: '/data/methodology',
+              link: t('data.methodology'),
+              color: 'var(--color-aegean)',
+            },
+            {
+              icon: 'clock',
+              title: 'It tells you the last bus',
+              body: 'Every line page shows the first and last service of the day, and what happens after that.',
+              href: '/network',
+              link: t('nav.network'),
+              color: 'var(--color-sun)',
+            },
+            {
+              icon: 'shield',
+              title: 'It never pretends to be live',
+              body: 'Every time is the operator’s published schedule, labelled with the date it was retrieved.',
+              href: '/data/quality',
+              link: t('data.quality'),
+              color: 'var(--color-olive)',
+            },
+          ].map((item) => (
+            <li>
+              <Card class="h-full">
+                <span
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]"
+                  style={`background:var(--color-surface-2);color:${item.color}`}
+                >
+                  <Icon name={item.icon as 'download'} size={18} />
+                </span>
+                <h3 class="mt-3 font-semibold text-[var(--color-ink)]">{item.title}</h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-[var(--color-ink-soft)]">{item.body}</p>
+                <a
+                  href={localeUrl(locale, item.href)}
+                  class="mt-3 inline-flex items-center gap-0.5 text-xs font-semibold text-[var(--brand)] no-underline hover:underline"
+                >
+                  {item.link}
+                  <Icon name="chevron" size={14} class="-rotate-90" />
+                </a>
+              </Card>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Not yet covered -->
+    <section class="mb-6">
+      <SectionHeading stripe="muted" as="h2">{t('islands.plannedTitle')}</SectionHeading>
+      <p class="max-w-prose text-sm text-[var(--color-ink-soft)]">{t('islands.plannedLede')}</p>
+      <ul class="mt-3 flex flex-wrap gap-2">
         {
           PLANNED.map((island) => (
             <li class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs text-[var(--color-muted)]">
@@ -244,94 +212,12 @@ const jsonLd = [organizationNode(), websiteNode(), islandListNode()];
           ))
         }
       </ul>
-      <a
-        href={localeUrl(locale, '/report')}
-        class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
-      >
-        {t('islands.reportSource')}
-        <Icon name="arrow-right" size={15} />
-      </a>
-    </div>
-  </section>
-
-  <!-- Why it exists -->
-  <section class="border-y border-[var(--color-border)] bg-[var(--color-surface-2)]">
-    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h2 class="text-2xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-3xl" style="letter-spacing: -0.02em;">
-        {t('network.title')}
-      </h2>
-      <p class="prose-measure mt-3 text-[var(--color-ink-soft)]">{t('network.lede')}</p>
-
-      <ul class="mt-10 grid gap-5 md:grid-cols-3">
-        {
-          [
-            {
-              icon: 'download',
-              title: 'It installs and it stays',
-              body: 'The planner is a PWA. Install it once on the bus or on the ferry and it opens without a signal. The dataset is baked into the build, so there is nothing to fetch at the harbour.',
-              href: '/data/methodology',
-              linkLabel: 'How the build works',
-            },
-            {
-              icon: 'clock',
-              title: 'It tells you the last bus',
-              body: 'The thing visitors actually need is the final departure, not the first. Every line page shows the first and last service of the day, and what happens after that — usually a taxi, sometimes a walk.',
-              href: '/network',
-              linkLabel: 'Read how island buses work',
-            },
-            {
-              icon: 'shield',
-              title: 'It never pretends to be live',
-              body: 'There is no real-time feed and we will not invent one. Every time on this site is the operator’s published schedule, labelled with the date it was retrieved. Where we interpolate, we say so.',
-              href: '/data/quality',
-              linkLabel: 'Known limits',
-            },
-          ].map((item) => (
-            <li class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-aegean-bg)] text-[var(--color-aegean-deep)]">
-                <Icon name={item.icon as any} size={20} />
-              </span>
-              <h3 class="mt-4 text-lg font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-                {item.title}
-              </h3>
-              <p class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">{item.body}</p>
-              <a
-                href={localeUrl(locale, item.href)}
-                class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
-              >
-                {item.linkLabel}
-                <Icon name="arrow-right" size={14} />
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <!-- Sponsorship, stated plainly -->
-  <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-    <div
-      class="grid gap-8 rounded-[var(--radius-lg)] border border-[var(--color-bougainvillea)] bg-[var(--color-bougainvillea-bg)] p-8 sm:grid-cols-[1fr_auto] sm:items-center"
-    >
-      <div>
-        <h2 class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-          This site costs money to run and takes sponsorship
-        </h2>
-        <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
-          Hosting, the data refresh and the domain are paid for. Sponsorship buys visibility. It has
-          never bought a data correction, a route being added, a ranking, or a word removed from a
-          known-limits page — and the sponsored content sits in a visually and structurally separate
-          block from everything we publish editorially.
-        </p>
-        <a
-          href={localeUrl(locale, '/sponsors')}
-          class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-bougainvillea)] no-underline hover:underline"
-        >
-          {t('sponsors.title')}
-          <Icon name="arrow-right" size={15} />
-        </a>
+      <div class="mt-4">
+        <Button href={localeUrl(locale, '/report')} variant="secondary" size="sm">
+          {t('islands.reportSource')}
+          <Icon name="arrow" size={15} />
+        </Button>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </BaseLayout>

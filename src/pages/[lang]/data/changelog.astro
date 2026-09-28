@@ -141,7 +141,7 @@ const kindLabel: Record<Entry['kind'], string> = {
     ]),
   ]}
 >
-  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+  <div class="shell py-14">
     <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
       <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
       <span aria-hidden="true"> / </span>
@@ -150,8 +150,10 @@ const kindLabel: Record<Entry['kind'], string> = {
       <span aria-current="page">{t('data.changelog')}</span>
     </nav>
 
-    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+    <p class="eyebrow">{t('data.title')}</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
       {t('data.changelog')}
+      <span class="rule" aria-hidden="true"></span>
     </h1>
     <p class="mt-2 text-sm text-[var(--color-muted)]">
       {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>

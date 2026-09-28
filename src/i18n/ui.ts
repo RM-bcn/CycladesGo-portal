@@ -30,9 +30,12 @@ const en: Record<string, string> = {
   'brand.tagline': 'Free, offline bus planning for the Cyclades — island by island.',
   'brand.subtagline': 'Scheduled times, not live tracking. Unofficial.',
 
-  'hero.title': 'Bus times for the Cyclades that work when your phone does not.',
+  'hero.eyebrow': 'Cyclades · 5 islands',
+  'hero.title': 'The Cyclades by bus',
   'hero.lede':
-    'CycladesGo is a family of free, offline-capable journey planners — one for each island. Open a line, get the times, the stops and the fare. No account, no tracking, no data roaming.',
+    'Bus times for the Cyclades that work when your phone does not. A family of free, offline-capable journey planners — one for each island. Open a line, get the times, the stops and the fare.',
+  'hero.lede2':
+    'No account, no tracking, no data roaming. Every time is the operator’s published schedule, labelled with the date we retrieved it.',
   'hero.ctaPrimary': 'Pick your island',
   'hero.ctaSecondary': 'How we get our data',
   'hero.stat1': 'islands live',
@@ -124,9 +127,12 @@ const el: Record<string, string> = {
   'brand.tagline': 'Δωρεάν, offline σχεδιασμό δρομολογίων για τις Κυκλάδες — νησί προς νησί.',
   'brand.subtagline': 'Προγραμματισμένοι χρόνοι, όχι live παρακολούθηση. Μη επίσημο.',
 
-  'hero.title': 'Δρομολόγια λεωφορείων στις Κυκλάδες που δουλεύουν και όταν δεν δουλεύει το τηλέφωνό σας.',
+  'hero.eyebrow': 'Κυκλάδες · 5 νησιά',
+  'hero.title': 'Οι Κυκλάδες με το λεωφορείο',
   'hero.lede':
-    'Το CycladesGo είναι μια οικογένεια δωρεάν, offline εφαρμογών σχεδιασμού ταξιδιού — μία για κάθε νησί. Ανοίξτε μια γραμμή, δείτε τους χρόνους, τις στάσεις και την τιμή. Χωρίς λογαριασμό, χωρίς tracking, χωρίς roaming.',
+    'Δρομολόγια λεωφορείων στις Κυκλάδες που δουλεύουν και όταν δεν δουλεύει το τηλέφωνό σας. Μια οικογένεια δωρεάν, offline εφαρμογών σχεδιασμού ταξιδιού — μία για κάθε νησί.',
+  'hero.lede2':
+    'Χωρίς λογαριασμό, χωρίς tracking, χωρίς roaming. Κάθε ώρα είναι το δημοσιευμένο πρόγραμμα του φορέα, με την ημερομηνία ανάκτησής του.',
   'hero.ctaPrimary': 'Διάλεξε το νησί σου',
   'hero.ctaSecondary': 'Πώς παίρνουμε τα δεδομένα',
   'hero.stat1': 'νησιά ενεργά',
@@ -221,9 +227,12 @@ const de: Record<string, string> = {
   'brand.tagline': 'Kostenlose Offline-Busplanung für die Kykladen — Insel für Insel.',
   'brand.subtagline': 'Geplante Zeiten, keine Live-Anzeige. Inoffiziell.',
 
-  'hero.title': 'Buszeiten für die Kykladen, die auch funktionieren, wenn dein Handy es nicht tut.',
+  'hero.eyebrow': 'Kykladen · 5 Inseln',
+  'hero.title': 'Die Kykladen mit dem Bus',
   'hero.lede':
-    'CycladesGo ist eine Familie kostenloser, offlinefähiger Reiseplaner — einen pro Insel. Linie öffnen, Zeiten, Haltestellen und Fahrpreis stehen da. Kein Konto, kein Tracking, kein Roaming.',
+    'Buszeiten für die Kykladen, die auch funktionieren, wenn dein Handy es nicht tut. Eine Familie kostenloser, offlinefähiger Reiseplaner — einen pro Insel.',
+  'hero.lede2':
+    'Kein Konto, kein Tracking, kein Roaming. Jede Zeit ist der veröffentlichte Fahrplan des Betreibers, mit dem Abrufdatum.',
   'hero.ctaPrimary': 'Insel auswählen',
   'hero.ctaSecondary': 'Woher unsere Daten kommen',
   'hero.stat1': 'Inseln live',
@@ -318,9 +327,12 @@ const fr: Record<string, string> = {
   'brand.tagline': 'Calcul d’itinéraires bus gratuit et hors ligne dans les Cyclades — île par île.',
   'brand.subtagline': 'Horaires planifiés, pas de suivi en direct. Non officiel.',
 
-  'hero.title': 'Les horaires de bus des Cyclades qui fonctionnent même quand votre téléphone ne fonctionne pas.',
+  'hero.eyebrow': 'Cyclades · 5 îles',
+  'hero.title': 'Les Cyclades en bus',
   'hero.lede':
-    'CycladesGo est une famille de calculateurs d’itinéraire gratuits et utilisables hors ligne — un par île. Ouvrez une ligne, obtenez les horaires, les arrêts et le tarif. Sans compte, sans tracking, sans data roaming.',
+    'Les horaires de bus des Cyclades qui fonctionnent même quand votre téléphone ne fonctionne pas. Une famille de calculateurs gratuits et utilisables hors ligne — un par île.',
+  'hero.lede2':
+    'Sans compte, sans tracking, sans data roaming. Chaque horaire est celui publié par l’exploitant, avec sa date de consultation.',
   'hero.ctaPrimary': 'Choisissez votre île',
   'hero.ctaSecondary': 'D’où viennent nos données',
   'hero.stat1': 'îles en ligne',
@@ -415,9 +427,12 @@ const it: Record<string, string> = {
   'brand.tagline': 'Pianificazione bus gratuita e offline per le Cicladi — isola per isola.',
   'brand.subtagline': 'Orari programmati, non in tempo reale. Non ufficiale.',
 
-  'hero.title': 'Gli orari dei bus nelle Cicladi che funzionano anche quando il telefono no.',
+  'hero.eyebrow': 'Cicladi · 5 isole',
+  'hero.title': 'Le Cicladi in bus',
   'hero.lede':
-    'CycladesGo è una famiglia di pianificatori di viaggio gratuiti e utilizzabili offline — uno per isola. Apri una linea, ottieni orari, fermate e tariffa. Nessun account, nessun tracking, nessun roaming.',
+    'Gli orari dei bus nelle Cicladi che funzionano anche quando il telefono no. Una famiglia di pianificatori gratuiti e utilizzabili offline — uno per isola.',
+  'hero.lede2':
+    'Nessun account, nessun tracking, nessun roaming. Ogni orario è quello pubblicato dall’operatore, con la data di consultazione.',
   'hero.ctaPrimary': 'Scegli la tua isola',
   'hero.ctaSecondary': 'Da dove arrivano i nostri dati',
   'hero.stat1': 'isole attive',

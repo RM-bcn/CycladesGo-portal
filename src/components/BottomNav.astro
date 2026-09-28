@@ -1,0 +1,60 @@
+---
+import Icon from './ui/Icon.astro';
+import { useTranslations } from '../i18n/ui';
+import { localeUrl, type Locale } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+  pathname: string;
+}
+const { locale, pathname } = Astro.props;
+const t = useTranslations(locale);
+
+/**
+ * The engine's app-style bottom navigation, carried over. On a phone the portal
+ * is still a bus product, so it gets the same five-place tab bar the PWAs have,
+ * with the same 3px active indicator, rather than a marketing top bar that has
+ * to be scrolled back to.
+ */
+const items = [
+  { href: '/', key: 'nav.home', icon: 'home' },
+  { href: '/islands', key: 'nav.islands', icon: 'pin' },
+  { href: '/network', key: 'nav.network', icon: 'info' },
+  { href: '/data', key: 'nav.data', icon: 'database' },
+  { href: '/about', key: 'nav.about', icon: 'user' },
+] as const;
+
+const isActive = (path: string) => {
+  const url = localeUrl(locale, path);
+  return path === '/' ? pathname === url || pathname === `${url}/` : pathname.startsWith(url);
+};
+---
+
+<nav
+  class="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur sm:hidden"
+  aria-label="Main"
+  style="padding-bottom: env(safe-area-inset-bottom)"
+>
+  <ul class="shell flex">
+    {
+      items.map((item) => (
+        <li class="flex-1">
+          <a
+            href={localeUrl(locale, item.href)}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class:list={[
+              'relative flex flex-col items-center gap-0.5 py-2 text-[0.7rem] font-medium no-underline',
+              isActive(item.href) ? 'text-[var(--color-aegean)]' : 'text-[var(--color-muted)]',
+            ]}
+          >
+            {isActive(item.href) && (
+              <span class="absolute inset-x-0 top-0 h-[3px] bg-[var(--color-aegean)]" aria-hidden="true" />
+            )}
+            <Icon name={item.icon} size={20} />
+            {t(item.key)}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

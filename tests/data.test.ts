@@ -24,6 +24,8 @@ describe('island registry', () => {
       expect(island.operator.name).toBeTruthy();
       expect(island.operator.site).toMatch(/^https:\/\//);
       expect(island.counts).not.toBeNull();
+      // The pack's own accent, so the portal and the island's PWA agree.
+      expect(island.accent).toMatch(/^#[0-9A-Fa-f]{6}$/);
       expect(island.dataValidTo).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(island.dataGeneratedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }

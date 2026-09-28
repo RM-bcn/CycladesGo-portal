@@ -63,15 +63,17 @@ const personNode = {
     personNode,
   ]}
 >
-  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+  <div class="shell py-14">
     <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
       <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
       <span aria-hidden="true"> / </span>
       <span aria-current="page">{t('about.title')}</span>
     </nav>
 
-    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+    <p class="eyebrow">{t('nav.about')}</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
       {t('about.title')}
+      <span class="rule" aria-hidden="true"></span>
     </h1>
     <p class="mt-2 text-sm text-[var(--color-muted)]">
       {t('legal.updated')}: <time datetime={dateModified} class="tabular">28 September 2026</time>
@@ -122,7 +124,7 @@ const personNode = {
         {
           notThis.map((item) => (
             <li class="flex gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-              <Icon name="unofficial" size={18} class="mt-0.5 shrink-0 text-[var(--color-muted)]" />
+              <Icon name="shield" size={18} class="mt-0.5 shrink-0 text-[var(--color-muted)]" />
               <p class="text-sm leading-relaxed text-[var(--color-ink-soft)]">{item}</p>
             </li>
           ))
@@ -200,7 +202,7 @@ const personNode = {
               class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
             >
               {t('footer.report')}
-              <Icon name="arrow-right" size={14} />
+              <Icon name="arrow" size={14} />
             </a>
           </Card>
         </li>
@@ -219,7 +221,7 @@ const personNode = {
               class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-bougainvillea)] no-underline hover:underline"
             >
               {t('sponsors.title')}
-              <Icon name="arrow-right" size={14} />
+              <Icon name="arrow" size={14} />
             </a>
           </Card>
         </li>

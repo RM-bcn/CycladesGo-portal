@@ -23,25 +23,26 @@ const href = (path: string) => localeUrl(locale, path);
 const isActive = (path: string) => pathname === href(path) || pathname.startsWith(`${href(path)}/`);
 ---
 
-<header
-  class="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg)]/92 backdrop-blur supports-[backdrop-filter]:bg-[var(--color-bg)]/80"
->
-  <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
-    <a href={href('/')} class="no-underline" aria-label={`${SITE.name} — ${t('nav.home')}`}>
-      <Logo size={26} />
+<header class="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur">
+  <div class="shell-wide flex items-center gap-3 py-3">
+    <a href={href('/')} class="flex items-center gap-2 no-underline">
+      <Logo size={28} />
+      <span class="text-lg font-semibold tracking-[-0.02em] text-[var(--color-ink)]">
+        {SITE.name}
+      </span>
     </a>
 
-    <nav aria-label="Main" class="ml-auto hidden items-center gap-1 md:flex">
+    <nav class="ml-auto hidden items-center gap-1 text-sm sm:flex" aria-label="Main">
       {
         nav.map((item) => (
           <a
             href={href(item.href)}
             aria-current={isActive(item.href) ? 'page' : undefined}
             class:list={[
-              'rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium no-underline transition-colors',
+              'rounded-md px-2.5 py-1.5 font-medium no-underline',
               isActive(item.href)
-                ? 'bg-[var(--color-aegean-bg)] text-[var(--color-aegean-deep)]'
-                : 'text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-ink)]',
+                ? 'bg-[var(--color-surface-2)] text-[var(--brand)]'
+                : 'text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]',
             ]}
           >
             {t(item.key)}
@@ -50,71 +51,85 @@ const isActive = (path: string) => pathname === href(path) || pathname.startsWit
       }
     </nav>
 
-    <div class="ml-auto flex items-center gap-1.5 md:ml-0">
-      <details class="relative hidden sm:block">
+    <div class="ml-auto flex items-center gap-2 sm:ml-0 sm:gap-3">
+      <details class="relative" data-header-menu>
         <summary
-          class="flex cursor-pointer list-none items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]"
+          class="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]"
+          aria-label={t('nav.lang')}
         >
-          <Icon name="globe" size={14} />
-          {LOCALE_NAMES[locale].endonym}
+          <Icon name="globe" size={18} />
+          <span class="uppercase">{locale}</span>
+          <Icon name="chevron" size={16} class="menu-chev" />
         </summary>
-        <ul
-          class="absolute right-0 z-50 mt-1 w-36 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] py-1 shadow-[var(--shadow-lift)]"
+        <nav
+          class="menu absolute right-0 z-50 mt-1 w-52 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-lift)]"
+          aria-label={t('nav.lang')}
         >
           {
-            Object.entries(LOCALE_NAMES).map(([code, name]) => (
-              <li>
+            Object.entries(LOCALE_NAMES).map(([code, name]) => {
+              const target = localeUrl(
+                code as Locale,
+                pathname.replace(/^\/(en|el|de|fr|it)(?=\/|$)/, '') || '/',
+              );
+              const current = code === locale;
+              return (
                 <a
-                  href={localeUrl(code as Locale, pathname.replace(/^\/(en|el|de|fr|it)(?=\/|$)/, '') || '/')}
-                  lang={name.hreflang}
+                  href={target}
                   hreflang={name.hreflang}
-                  aria-current={code === locale ? 'true' : undefined}
+                  lang={name.hreflang}
+                  aria-current={current ? 'true' : undefined}
                   class:list={[
-                    'block px-3 py-2 text-sm no-underline',
-                    code === locale
-                      ? 'bg-[var(--color-aegean-bg)] font-semibold text-[var(--color-aegean-deep)]'
-                      : 'text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]',
+                    'flex items-center gap-2 rounded px-3 py-2 text-sm no-underline hover:bg-[var(--color-surface-2)]',
+                    current
+                      ? 'font-semibold text-[var(--color-ink)]'
+                      : 'text-[var(--color-ink-soft)]',
                   ]}
                 >
                   {name.endonym}
+                  <span
+                    class:list={[
+                      'ml-auto font-mono text-xs uppercase',
+                      current ? 'text-[var(--brand)]' : 'text-[var(--color-muted)]',
+                    ]}
+                  >
+                    {code}
+                  </span>
+                  {current && <Icon name="check" size={16} class="text-[var(--brand)]" />}
                 </a>
-              </li>
-            ))
+              );
+            })
           }
-        </ul>
+        </nav>
       </details>
 
       <button
         type="button"
         data-theme-toggle
         aria-label={t('nav.theme')}
-        class="flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]"
+        class="inline-flex cursor-pointer items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-2)]"
       >
-        <span class="hidden sm:inline dark:hidden"><Icon name="moon" size={14} /></span>
-        <span class="hidden dark:inline sm:inline"><Icon name="sun" size={14} /></span>
+        <span class="hidden dark:inline"><Icon name="sun" size={18} /></span>
+        <span class="inline dark:hidden"><Icon name="moon" size={18} /></span>
       </button>
     </div>
   </div>
-
-  <nav aria-label="Main (compact)" class="flex gap-1 overflow-x-auto border-t border-[var(--color-border)] px-4 py-1.5 md:hidden">
-    {
-      nav.map((item) => (
-        <a
-          href={href(item.href)}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-          class:list={[
-            'shrink-0 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-[13px] font-medium no-underline',
-            isActive(item.href)
-              ? 'bg-[var(--color-aegean-bg)] text-[var(--color-aegean-deep)]'
-              : 'text-[var(--color-ink-soft)]',
-          ]}
-        >
-          {t(item.key)}
-        </a>
-      ))
-    }
-  </nav>
 </header>
+
+<style>
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::marker {
+    content: '';
+  }
+  /* The engine's chevron rotates to signal the open menu. */
+  details[open] .menu-chev {
+    transform: rotate(180deg);
+  }
+  .menu-chev {
+    transition: transform 0.15s ease;
+  }
+</style>
 
 <script>
   const btn = document.querySelector('[data-theme-toggle]');
@@ -125,5 +140,34 @@ const isActive = (path: string) => pathname === href(path) || pathname.startsWit
     try {
       localStorage.setItem('cg-theme', next);
     } catch {}
+  });
+
+  // One open header menu at a time, and Escape closes it, as in the engine.
+  const menus = document.querySelectorAll('[data-header-menu]');
+  const close = (d: HTMLDetailsElement) => d.removeAttribute('open');
+  menus.forEach((menu) => {
+    menu.addEventListener('toggle', () => {
+      if (menu.hasAttribute('open')) {
+        menus.forEach((other) => {
+          if (other !== menu) close(other as HTMLDetailsElement);
+        });
+      }
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    menus.forEach((menu) => {
+      const open = menu as HTMLDetailsElement;
+      if (open.hasAttribute('open')) {
+        close(open);
+        open.querySelector('summary')?.focus();
+      }
+    });
+  });
+  document.addEventListener('click', (event) => {
+    menus.forEach((menu) => {
+      const open = menu as HTMLDetailsElement;
+      if (open.hasAttribute('open') && !open.contains(event.target as Node)) close(open);
+    });
   });
 </script>

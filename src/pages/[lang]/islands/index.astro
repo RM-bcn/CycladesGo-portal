@@ -3,6 +3,10 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Icon from '../../../components/ui/Icon.astro';
 import TrustBanner from '../../../components/TrustBanner.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import Card from '../../../components/ui/Card.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import DomeBadge from '../../../components/ui/DomeBadge.astro';
 import OperatorAttribution from '../../../components/OperatorAttribution.astro';
 import InstallCTA from '../../../components/InstallCTA.astro';
 import { ISLANDS, PLANNED } from '../../../data/islands';
@@ -33,30 +37,28 @@ const hreflangLocales = publishedLocalesFor(path);
     ]),
   ]}
 >
-  <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-    <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
-      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
-      <span aria-hidden="true"> / </span>
-      <span aria-current="page">Islands</span>
-    </nav>
+  <div class="shell-wide py-6">
+    <PageHeader
+      eyebrow={t('nav.islands')}
+      title={t('islands.title')}
+      lede={t('islands.lede')}
+    />
 
-    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
-      {t('islands.title')}
-    </h1>
-    <p class="prose-measure mt-3 text-lg text-[var(--color-ink-soft)]">{t('islands.lede')}</p>
-
-    <TrustBanner locale={locale} class="mt-6 max-w-3xl" />
+    <TrustBanner locale={locale} class="mb-8" />
 
     <ul class="mt-10 space-y-4">
       {
         ISLANDS.map((island) => (
           <li>
-            <article class="grid gap-6 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-cube)] sm:grid-cols-[1fr_auto] sm:items-center">
+            <Card as="article" class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
               <div>
-                <h2 class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-                  {island.brand}{' '}
-                  <span class="text-base font-normal text-[var(--color-muted)]">
-                    — {island.name} (<span lang="el">{island.nameEl}</span>)
+                <h2 class="flex items-center gap-3 text-lg font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+                  <DomeBadge line={String(island.counts?.lines ?? 0)} color={island.accent} />
+                  <span>
+                    {island.brand}{' '}
+                    <span class="text-base font-normal text-[var(--color-muted)]">
+                      — {island.name} (<span lang="el">{island.nameEl}</span>)
+                    </span>
                   </span>
                 </h2>
                 <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
@@ -107,16 +109,16 @@ const hreflangLocales = publishedLocalesFor(path);
               </div>
 
               <InstallCTA island={island} variant="inline" />
-            </article>
+            </Card>
           </li>
         ))
       }
     </ul>
 
     <section aria-labelledby="planned" class="mt-14">
-      <h2 id="planned" class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+      <SectionHeading id="planned" as="h2" stripe="muted" size="lg">
         {t('islands.plannedTitle')}
-      </h2>
+      </SectionHeading>
       <p class="prose-measure mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">
         {t('islands.plannedLede')}
       </p>
@@ -134,7 +136,7 @@ const hreflangLocales = publishedLocalesFor(path);
         class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-aegean)] no-underline hover:underline"
       >
         {t('islands.reportSource')}
-        <Icon name="arrow-right" size={15} />
+        <Icon name="arrow" size={15} />
       </a>
     </section>
   </div>

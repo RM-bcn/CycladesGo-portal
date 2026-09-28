@@ -1,0 +1,53 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit' | 'reset';
+  href?: string;
+  class?: string;
+  disabled?: boolean;
+  [key: string]: unknown;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  href,
+  class: className = '',
+  disabled,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 font-medium transition rounded-[var(--radius-md)] whitespace-nowrap';
+
+const variants: Record<string, string> = {
+  primary:
+    'bg-[var(--color-aegean)] text-[var(--color-aegean-btn-text)] hover:bg-[var(--color-aegean-btn-hover)] font-semibold',
+  secondary:
+    'bg-[var(--color-surface-2)] text-[var(--color-ink)] border border-[var(--color-border)] hover:bg-[var(--color-border)]',
+  ghost: 'bg-transparent text-[var(--color-aegean)] hover:bg-[var(--color-aegean-bg)]',
+  danger: 'bg-[var(--color-terracotta)] text-white hover:bg-[var(--color-terracotta)]',
+};
+
+const sizes: Record<string, string> = {
+  sm: 'px-3 py-1.5 text-xs',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-5 py-2.5 text-base',
+};
+
+const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes} disabled={disabled} {...rest}>
+      <slot />
+    </button>
+  )
+}

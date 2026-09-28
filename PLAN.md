@@ -156,9 +156,36 @@ Inside the existing design plan. No new visual language was invented — that wa
 constraint, and the right one, because the portal and the PWAs must read as one
 product.
 
-**Cycladic Sun** (light) and **Aegean Night v2** (dark) are ported token-for-token
-from `Naxos-bus-pwa/src/styles/global.css`. Both keep the three properties that
-make the existing design work:
+**The portal is the NaxosGo design, not a design that uses the NaxosGo colours.**
+The first version ported only the tokens and came out looking like a generic
+marketing template in the right palette, which is the wrong product impression on
+a site whose whole pitch is that it is the same people who make the app you
+already trust. Everything that carries the engine's character is now ported
+component-for-component:
+
+| Ported | From |
+|---|---|
+| the bus mark on its `rx: 14` tile, with per-theme fills resolved in CSS | `Logo.astro` + the boot lockup |
+| the stroke icon set (`stroke-width 2`, round caps, `currentColor`) | `ui/Icon.astro` |
+| `Button` (primary/secondary/ghost/danger, sm/md/lg) | `ui/Button.astro` |
+| `Card` — **radius-md, p-4** | `ui/Card.astro` |
+| `SectionHeading` — uppercase, 3px stripe, right-aligned action | `ui/SectionHeading.astro` |
+| `DomeBadge` + the `.dome-badge` class | `ui/DomeBadge.astro` |
+| the masthead: eyebrow, H1, trailing rule, lede | the home hero |
+| the header pills and the language menu | `BaseLayout.astro` header, `LanguageSwitcher.astro` |
+| the mobile bottom tab bar with its 3px active indicator | `BaseLayout.astro` bottom nav |
+| `max-w-3xl` content column | the engine's shell |
+
+Two deliberate deviations, because the portal has a job the PWA does not: the
+home and island-directory pages get `.shell-wide` (the engine is one column
+everywhere, and a five-item list needs the room), and `Card` gained an `as` prop
+so a card can be an `<article>`.
+
+Each island's dome badge wears `island.accent`, copied from that pack's
+`theme.accent` in the engine, so the portal and that island's PWA are the same
+colour.
+
+Both keep the three properties that make the existing design work:
 
 - the warm plaster grain (`body::before`) and, in dark, the moonlight glow
   (`body::after`) — atmosphere without an image asset;
@@ -178,6 +205,11 @@ Layout decisions worth keeping:
 
 - **68ch measure** on all long-form prose. This is a reading site; the PWAs are a
   utility. Different job, different measure.
+- **The island directory is a list, not a card grid.** The engine's home screen
+  is a list of route rows — dome badge, name, meta, a status chip, a chevron —
+  and the portal's island list is that same row. Re-expressing it as a 3-up card
+  grid was the other thing that made the first version read as a different
+  product.
 - **Disclosure components, not copy-paste.** `OperatorAttribution` has an `inline`
   variant for under a table and a `block` variant for a full panel. A disclaimer
   that is not proximate to the claim it qualifies is weak evidence of reasonable

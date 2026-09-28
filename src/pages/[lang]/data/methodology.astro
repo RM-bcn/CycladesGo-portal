@@ -49,7 +49,7 @@ const dateModified = '2026-09-28';
     ]),
   ]}
 >
-  <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+  <div class="shell py-14">
     <nav aria-label="Breadcrumb" class="mb-6 text-xs text-[var(--color-muted)]">
       <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
       <span aria-hidden="true"> / </span>
@@ -58,8 +58,10 @@ const dateModified = '2026-09-28';
       <span aria-current="page">Methodology</span>
     </nav>
 
-    <h1 class="text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
+    <p class="eyebrow">CycladesGo</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
       How we get our data
+      <span class="rule" aria-hidden="true"></span>
     </h1>
     <p class="mt-2 text-sm text-[var(--color-muted)]">
       Last updated: <time datetime={dateModified} class="tabular">28 September 2026</time>
@@ -254,7 +256,7 @@ const dateModified = '2026-09-28';
         class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline hover:bg-[var(--color-aegean-btn-hover)]"
       >
         {t('data.quality')}
-        <Icon name="arrow-right" size={16} />
+        <Icon name="arrow" size={16} />
       </a>
       <a
         href={localeUrl(locale, '/data/changelog')}

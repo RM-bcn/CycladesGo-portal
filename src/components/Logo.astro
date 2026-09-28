@@ -1,36 +1,81 @@
 ---
 /**
- * CycladesGo wordmark. Text-only wordmark plus a geometric mark — no operator
- * logos anywhere on this site, because a nominative-use defence for a logo is
- * far weaker than for a plain name (see docs/legal.md §trademarks).
+ * The CycladesGo bus mark, ported from the engine repo's
+ * `src/components/Logo.astro` and `BaseLayout.astro` boot lockup.
+ *
+ * The geometry is unchanged: a sea line, a sun-lamp bar, the body, three glass
+ * windows, a stripe and two wheels with hubs, on a tile with radius 14. The
+ * fills are the token values, resolved per theme through the `data-theme`
+ * attribute, because the mark is the one place where the design's character
+ * lives and a generic glyph would cost the brand its recognisability.
  */
 interface Props {
   size?: number;
+  variant?: 'light' | 'dark' | 'maskable';
   class?: string;
+  label?: string;
 }
-const { size = 28, class: className = '' } = Astro.props;
+
+const { size = 28, variant = 'light', class: className = '', label } = Astro.props;
+
+const fills =
+  variant === 'dark'
+    ? {
+        tile: '#182632', sea: '#4FB3B3', body: '#5FA8E0', glass: '#F2C069',
+        wheel: '#0B151D', hub: '#5FA8E0', lamp: '#F2C069', stripe: '#182632',
+      }
+    : {
+        tile: '#FAF7F2', sea: '#0E8A8F', body: '#1268B3', glass: '#FAF7F2',
+        wheel: '#0D2B4A', hub: '#FAF7F2', lamp: '#E8A33C', stripe: '#FAF7F2',
+      };
+
+const isMaskable = variant === 'maskable';
+const tileRx = isMaskable ? 0 : 14;
 ---
 
-<span class={`inline-flex items-center gap-2 ${className}`}>
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 32 32"
-    fill="none"
-    role="img"
-    aria-label="CycladesGo"
-    class="shrink-0"
-  >
-    <rect width="32" height="32" rx="8" fill="var(--color-aegean)" />
-    <path
-      d="M5 20.5C5 13.6 10.1 8 16.4 8c4.6 0 8.5 3 10.1 7.2"
-      stroke="#FAF7F2"
-      stroke-width="2.4"
-      stroke-linecap="round"
-    />
-    <circle cx="10.4" cy="21.4" r="2.6" fill="#FAF7F2" />
-    <circle cx="20.8" cy="21.4" r="2.6" fill="#FAF7F2" />
-    <path d="M5 25.6h22" stroke="#FAF7F2" stroke-width="2.4" stroke-linecap="round" />
-  </svg>
-  <span class="font-semibold tracking-tight text-[var(--color-ink)]">CycladesGo</span>
-</span>
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label={label ?? 'CycladesGo'}
+>
+  <rect width="64" height="64" rx={tileRx} fill={fills.tile} />
+  <g transform={isMaskable ? 'translate(6.4 6.4) scale(0.8)' : undefined}>
+    <rect class="bs-sea" x="10" y="51" width="44" height="3" rx="1.5" fill={fills.sea} />
+    <rect class="bs-lamp" x="10" y="15" width="44" height="6" rx="3" fill={fills.lamp} />
+    <rect class="bs-body" x="10" y="19" width="44" height="23" rx="5" fill={fills.body} />
+    <rect class="bs-glass" x="15" y="24" width="10" height="9" rx="2" fill={fills.glass} />
+    <rect class="bs-glass" x="28" y="24" width="10" height="9" rx="2" fill={fills.glass} />
+    <rect class="bs-glass" x="41" y="24" width="9" height="12" rx="2" fill={fills.glass} />
+    {
+      size >= 32 && (
+        <rect
+          class="bs-stripe"
+          x="13"
+          y="37"
+          width="38"
+          height="2.5"
+          rx="1.25"
+          fill={fills.stripe}
+          opacity=".45"
+        />
+      )
+    }
+    {size >= 24 && <circle class="bs-lamp" cx="51" cy="38" r="2.2" fill={fills.lamp} />}
+    <circle class="bs-wheel" cx="22" cy="45" r="6" fill={fills.wheel} />
+    <circle class="bs-hub" cx="22" cy="45" r="2.4" fill={fills.hub} />
+    <circle class="bs-wheel" cx="42" cy="45" r="6" fill={fills.wheel} />
+    <circle class="bs-hub" cx="42" cy="45" r="2.4" fill={fills.hub} />
+  </g>
+</svg>
+
+{/*
+  The engine resolves the mark's fills per theme in CSS (`.bs-tile`,
+  `.bs-body`, …) because the PWA has no chance to re-render the SVG. The portal
+  uses the same technique so the mark follows the theme toggle without a
+  re-render, which is why the literal fills above are only the light defaults.
+*/}

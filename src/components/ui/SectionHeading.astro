@@ -1,16 +1,58 @@
 ---
+import Icon from './Icon.astro';
+
 interface Props {
-  as?: 'h1' | 'h2' | 'h3' | 'h4';
+  /** Needed wherever a heading is an in-page navigation target. */
   id?: string;
   class?: string;
+  /** `muted` is a portal addition: a section with no positive claim to make. */
+  stripe?: 'aegean' | 'sun' | 'terracotta' | 'sea' | 'olive' | 'bougainvillea' | 'muted';
+  size?: 'sm' | 'lg';
+  href?: string;
+  action?: string;
+  as?: 'h2' | 'h3';
 }
-const { as: Tag = 'h2', id, class: className = '' } = Astro.props;
+
+const { id, class: className = '', stripe = 'aegean', size = 'sm', href, action, as: Tag = 'h2' } =
+  Astro.props;
+
+const stripeColor = `var(--color-${stripe})`;
+const stripeWidth = size === 'lg' ? '48px' : '28px';
 ---
 
-<Tag
-  id={id}
-  class={`font-semibold tracking-tight text-[var(--color-ink)] ${Tag === 'h1' ? 'text-3xl sm:text-4xl' : Tag === 'h2' ? 'text-xl sm:text-2xl' : 'text-lg'} ${className}`}
-  style="letter-spacing: -0.02em;"
->
+<Tag id={id} class={`section-heading ${className}`}>
   <slot />
+  <span class="stripe" style={`background:${stripeColor};width:${stripeWidth}`} aria-hidden="true"
+  ></span>
+  {
+    href && action && (
+      <a
+        href={href}
+        class="ml-auto inline-flex shrink-0 items-center gap-0.5 text-xs font-semibold normal-case tracking-normal text-[var(--brand)] hover:underline"
+      >
+        {action}
+        <Icon name="chevron" size={14} class="-rotate-90" />
+      </a>
+    )
+  }
 </Tag>
+
+<style>
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+  }
+  .stripe {
+    display: inline-block;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+</style>

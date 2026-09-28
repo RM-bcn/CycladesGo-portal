@@ -226,6 +226,103 @@ body::before {
  */
 
 /*
+ * --- Structural primitives, ported from the engine ----------------------------
+ * These four are the parts of the NaxosGo UI that carry the most of its
+ * character, so they are classes with the engine's exact values rather than
+ * utility soup repeated per page. Diverging here is what made the first version
+ * of this site read as a generic template in the same colours.
+ */
+
+/* The engine's content column. A portal has grids as well as prose, so the
+   shell comes in two widths: this one for reading, `--cg-shell-wide` for the
+   island directory. Both share the padding. */
+.shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 48rem; /* 48rem = max-w-3xl, the engine's value */
+  padding-inline: 1rem;
+}
+.shell-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 64rem;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .shell,
+  .shell-wide {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* The eyebrow above a page title: `KTEL NAXOS` in the engine. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-aegean);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The short bar that trails a display heading. The engine's signature. */
+.rule {
+  display: none;
+  height: 3px;
+  width: 3rem;
+  border-radius: 2px;
+  background: var(--color-aegean);
+  vertical-align: baseline;
+}
+@media (min-width: 480px) {
+  .rule {
+    display: inline-block;
+  }
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-cube);
+}
+
+/* The line badge: a dome, mono numeral, 30px square. */
+.dome-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding-inline: 6px;
+  border-radius: 999px 999px 8px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-aegean-btn-text);
+  flex-shrink: 0;
+  text-align: center;
+}
+:root[data-theme='dark'] .dome-badge {
+  color: var(--color-ink);
+}
+
+/*
+ * The mark's per-theme fills, ported from the engine. Kept as CSS rather than a
+ * re-render so the logo follows the theme toggle the instant it is pressed.
+ */
+:root[data-theme='dark'] .bs-tile { fill: #182632; }
+:root[data-theme='dark'] .bs-sea { fill: #4FB3B3; }
+:root[data-theme='dark'] .bs-body { fill: #5FA8E0; }
+:root[data-theme='dark'] .bs-glass { fill: #F2C069; }
+:root[data-theme='dark'] .bs-wheel { fill: #0B151D; }
+:root[data-theme='dark'] .bs-hub { fill: #5FA8E0; }
+:root[data-theme='dark'] .bs-lamp { fill: #F2C069; }
+:root[data-theme='dark'] .bs-stripe { fill: #182632; }
+
+/*
  * `.doc` styles the long-form content flow. Hand-rolled rather than pulled from
  * a typography plugin because the legal pages are dense with <dl>, <table> and
  * definition-list content that the usual presets do not cover, and because the

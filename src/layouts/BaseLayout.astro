@@ -4,6 +4,7 @@ import Seo from '../components/Seo.astro';
 import ThemeInit from '../components/ThemeInit.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import BottomNav from '../components/BottomNav.astro';
 import { SITE } from '../data/site';
 import { useTranslations } from '../i18n/ui';
 import { localeUrl, type Locale } from '../i18n/utils';
@@ -46,7 +47,7 @@ const authorUrl = new URL(localeUrl(locale, '/about'), SITE.url).href;
       dateModified={dateModified}
     />
   </head>
-  <body>
+  <body class="min-h-screen antialiased">
     <a class="skip-link" href="#main">{t('nav.skip')}</a>
     <SiteHeader locale={locale} pathname={pathname} />
     {
@@ -62,9 +63,11 @@ const authorUrl = new URL(localeUrl(locale, '/about'), SITE.url).href;
         </div>
       )
     }
-    <main id="main">
+    {/* The engine pads for the bottom bar so the last row is never covered. */}
+    <main id="main" class="pb-20 sm:pb-0">
       <slot />
     </main>
     <SiteFooter locale={locale} />
+    <BottomNav locale={locale} pathname={pathname} />
   </body>
 </html>

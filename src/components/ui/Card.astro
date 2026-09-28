@@ -1,14 +1,31 @@
 ---
+/**
+ * Ported from the engine's `src/components/ui/Card.astro`. The engine uses
+ * radius-md and p-4; the first version of this portal used radius-lg and p-6,
+ * which is the single clearest sign it had been designed as a separate product.
+ */
 interface Props {
-  as?: 'div' | 'section' | 'article' | 'li';
   class?: string;
-  padded?: boolean;
+  href?: string;
+  padding?: boolean;
+  /** Wrapper element. An extension over the engine's Card, which hardcodes a
+   *  div, needed so a card can be an <article> or a <section> and be announced
+   *  as one. */
+  as?: 'div' | 'section' | 'article' | 'li';
 }
-const { as: Tag = 'div', class: className = '', padded = true } = Astro.props;
+
+const { class: className = '', href, padding = true, as: Tag = 'div' } = Astro.props;
+const classes = `card ${padding ? 'p-4' : ''} ${className}`;
 ---
 
-<Tag
-  class={`rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-cube)] ${padded ? 'p-5' : ''} ${className}`}
->
-  <slot />
-</Tag>
+{
+  href ? (
+    <a href={href} class={`group block transition hover:shadow-[var(--shadow-lift)] ${classes}`}>
+      <slot />
+    </a>
+  ) : (
+    <Tag class={classes}>
+      <slot />
+    </Tag>
+  )
+}

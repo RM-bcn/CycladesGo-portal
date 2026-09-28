@@ -34,6 +34,11 @@ export interface IslandEntry {
   blurb: { en: string; el?: string };
   /** Counted from the engine dataset, not typed by hand. `null` = not synced. */
   counts: { stops: number; lines: number; journeys: number } | null;
+  /**
+   * The pack's `theme.accent`, copied from the engine's island config. It is the
+   * colour that island's own PWA uses, so the portal and the app agree.
+   */
+  accent: string;
   /** `YYYY-MM-DD` from the engine dataset's `meta.generatedAt`. */
   dataGeneratedAt: string | null;
   dataValidTo: string | null;
@@ -60,6 +65,7 @@ export const ISLANDS: IslandEntry[] = [
     blurb: {
       en: 'The biggest network in the Cyclades: five lines out of Naxos Town, from Apollon to the mountain villages of Apeiranthos.',
     },
+    accent: '#1268B3',
     counts: { stops: 55, lines: 5, journeys: 112 },
     dataGeneratedAt: '2026-09-26',
     dataValidTo: '2026-10-03',
@@ -81,6 +87,7 @@ export const ISLANDS: IslandEntry[] = [
     blurb: {
       en: 'Fourteen local lines around Naoussa, Alyko and Antiparos, plus the trunk routes to Parikia and the two ports.',
     },
+    accent: '#0F6E8C',
     counts: { stops: 25, lines: 14, journeys: 84 },
     dataGeneratedAt: '2026-09-26',
     dataValidTo: '2026-10-03',
@@ -102,6 +109,7 @@ export const ISLANDS: IslandEntry[] = [
     blurb: {
       en: 'The island with the most ferry passengers in the Aegean. Ten lines linking Fira, Kamari, Perissa and the Athinios ferry terminal.',
     },
+    accent: '#C2542B',
     counts: { stops: 20, lines: 10, journeys: 62 },
     dataGeneratedAt: '2026-09-26',
     dataValidTo: '2026-10-03',
@@ -124,6 +132,7 @@ export const ISLANDS: IslandEntry[] = [
     blurb: {
       en: 'A private operator rather than a KTEL cooperative, running Adamas, Plaka, Pollonia, Provatas and the airport.',
     },
+    accent: '#2E7D6B',
     counts: { stops: 19, lines: 7, journeys: 52 },
     dataGeneratedAt: '2026-09-26',
     dataValidTo: '2026-10-03',
@@ -147,6 +156,7 @@ export const ISLANDS: IslandEntry[] = [
     blurb: {
       en: 'A small, honest dataset: the Port–Chora–Mylopotas line, which is genuinely all Ios has.',
     },
+    accent: '#1E5AA8',
     counts: { stops: 3, lines: 1, journeys: 6 },
     dataGeneratedAt: '2026-09-26',
     dataValidTo: '2026-10-03',

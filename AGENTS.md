@@ -67,6 +67,8 @@ that was never built.
 
 ### Rule 3 — never put a hex colour in an `.astro` file
 
+*(Rule 4, design parity, is in [§8](#8-design-system).)*
+
 Colour comes from the design tokens in `src/styles/global.css`. Use
 `var(--color-…)` (Tailwind arbitrary values such as `text-[var(--color-ink)]`),
 or a `<Token>` component.
@@ -248,6 +250,35 @@ Rules that are easy to get wrong:
 8. **`dateModified`** on `LegalLayout` and on editorial pages, as an ISO date.
 
 ## 8. Design system
+
+**Rule 4 — the portal is the NaxosGo design, not a design that uses the NaxosGo
+colours.** Porting the tokens was not enough and produced a site that read as a
+generic marketing template in the right palette. The following are ported
+component-for-component from the engine, and a change to one is a change to both:
+
+| Portal | Engine source |
+|---|---|
+| `components/ui/Icon.astro` | same file — stroke set, `stroke-width 2`, round caps, `currentColor` |
+| `components/Logo.astro` | `Logo.astro` + the boot-lockup SVG in `BaseLayout.astro` |
+| `components/ui/Button.astro` | `ui/Button.astro`, variants and sizes unchanged |
+| `components/ui/Card.astro` | `ui/Card.astro` — **radius-md, p-4**, not radius-lg/p-6 |
+| `components/ui/SectionHeading.astro` | `ui/SectionHeading.astro` — uppercase, 3px stripe, right action |
+| `components/ui/DomeBadge.astro` | `ui/DomeBadge.astro` + the `.dome-badge` class |
+| `components/PageHeader.astro` | the home hero: `.eyebrow`, H1, trailing `.rule`, lede |
+| `components/SiteHeader.astro` | `BaseLayout.astro` header + `LanguageSwitcher.astro` |
+| `components/BottomNav.astro` | `BaseLayout.astro` bottom nav, including the 3px active bar |
+| `.card`, `.dome-badge`, `.eyebrow`, `.rule`, `.shell` in `global.css` | the same classes in the engine's stylesheet |
+
+Two intentional deviations, both because the portal has a job the PWA does not:
+
+- **`.shell-wide`.** The engine is entirely `max-w-3xl`. The portal's home page
+  and island directory are lists of five, so they get `max-w-4rem` of column.
+  Every reading page uses plain `.shell`, which is the engine's width.
+- **`Card`'s `as` prop.** The engine hardcodes a `div`; the portal needs
+  `<article>` and `<section>` so the cards are announced correctly.
+
+Each island's badge and pin wears `island.accent`, copied from that pack's
+`theme.accent` in the engine's config. It is not a colour chosen here.
 
 The tokens in `src/styles/global.css` are a **verbatim port** of the engine
 repo's `src/styles/global.css`: "Cycladic Sun" in light, "Aegean Night v2" in

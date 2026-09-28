@@ -1,0 +1,11 @@
+---
+interface Props {
+  line: string;
+  color?: string;
+  class?: string;
+}
+
+const { line, color = 'var(--color-aegean)', class: className = '' } = Astro.props;
+---
+
+<span class={`dome-badge ${className}`} style={`background:${color}`}>{line}</span>
