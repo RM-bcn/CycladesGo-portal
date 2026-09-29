@@ -66,8 +66,11 @@ const PAGES = [
   { slug: '12-privacy', url: '/en/legal/privacy/', name: 'Privacy' },
   { slug: '13-accessibility', url: '/en/legal/accessibility/', name: 'Accessibility' },
   { slug: '14-untranslated-de', url: '/de/network/', name: 'Untranslated locale state' },
-  { slug: '15-404', url: '/404.html', name: '404 wrong stop' },
-  { slug: '16-500', url: '/500.html', name: '500 data failure' },
+  { slug: '15-guides-index', url: '/en/guides/', name: 'Guides index' },
+  { slug: '16-guide-ferry', url: '/en/guides/ferry-to-bus-connections/', name: 'Guide article' },
+  { slug: '17-guide-compare', url: '/en/guides/which-island-has-the-best-bus-network/', name: 'Comparison guide' },
+  { slug: '18-404', url: '/404.html', name: '404 wrong stop' },
+  { slug: '19-500', url: '/500.html', name: '500 data failure' },
 ];
 
 await mkdir(OUT, { recursive: true });

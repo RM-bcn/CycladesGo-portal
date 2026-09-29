@@ -1,0 +1,252 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import type { GuideData } from '../../../content/schema';
+import { slugOf } from '../../../content/slug';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import Button from '../../../components/ui/Button.astro';
+import InstallCTA from '../../../components/InstallCTA.astro';
+import TrustBanner from '../../../components/TrustBanner.astro';
+import SourceSnapshotBanner from '../../../components/SourceSnapshotBanner.astro';
+import { ORGANIZATION_ID, MAINTAINER_ID, breadcrumbNode } from '../../../lib/jsonld';
+import { getIsland } from '../../../data/islands';
+import { SITE } from '../../../data/site';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const entries = (await getCollection('guides', (e) => !e.data.draft));
+  return LOCALES.flatMap((lang) =>
+    entries.map((entry) => ({ params: { lang, slug: slugOf(entry.id) } })),
+  );
+};
+
+/**
+ * Astro 5.18's glob loader types the entry's data as `any`, so the shape is
+ * asserted here from the Zod schema. One cast in one place beats an `any`
+ * spreading through a page.
+ */
+type GuideEntry = CollectionEntry<'guides'> & { data: GuideData };
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = `/guides/${Astro.params.slug}`;
+const hreflangLocales = publishedLocalesFor(path);
+
+// One page per guide, rendered for every locale. Only English content exists
+// today, so every non-English route is the not-translated state: noindex, no
+// hreflang, banner shown. That is Seo.astro's rule, not a special case here.
+const entries = ((await getCollection('guides')) as GuideEntry[]).filter((e) => !e.data.draft);
+const entry = entries.find((e) => slugOf(e.id) === Astro.params.slug);
+
+if (!entry) {
+  // Build-time guard: a slug in a link but not in the collection is a broken
+  // link, and the 404 is a worse place to find out about it than a failed build.
+  throw new Error(`No guide with slug "${Astro.params.slug}"`);
+}
+
+const { Content, headings } = await render(entry);
+const data: GuideData = entry.data;
+
+const island = getIsland(data.cta.island);
+const cta = island
+  ? `${island.currentUrl}/en/plan${(() => {
+      const p = new URLSearchParams();
+      if (data.cta.from) p.set('from', data.cta.from);
+      if (data.cta.to) p.set('to', data.cta.to);
+      if (data.cta.arrive) p.set('arrive', data.cta.arrive);
+      p.set('ref', 'portal');
+      return p.size ? `?${p}` : '';
+    })()}`
+  : localeUrl(locale, '/islands');
+
+const wordCount = entry.body
+  ?.replace(/^---[\s\S]*?---/, '')
+  .split(/\s+/)
+  .filter(Boolean).length;
+
+const published = data.published.toISOString().slice(0, 10);
+const updated = (data.updated ?? data.published).toISOString().slice(0, 10);
+const verified = data.verified.toISOString().slice(0, 10);
+
+const toc = headings.filter((h: { depth: number }) => h.depth === 2);
+
+const jsonLd: Array<Record<string, unknown>> = [
+  { '@type': 'Organization', '@id': ORGANIZATION_ID },
+  {
+    '@type': 'Article',
+    '@id': `${SITE.url}${localeUrl(locale, path)}#article`,
+    headline: data.title,
+    description: data.description,
+    datePublished: published,
+    dateModified: updated,
+    inLanguage: 'en',
+    author: { '@id': MAINTAINER_ID },
+    publisher: { '@id': ORGANIZATION_ID },
+    isAccessibleForFree: true,
+    mainEntityOfPage: { '@id': `${SITE.url}${localeUrl(locale, path)}` },
+    // Provenance, in the machine-readable form. The same sources are listed
+    // visibly below; a fact may not live only in the graph.
+    citation: data.sources.map((s) => `${s.url} (retrieved ${s.retrieved.toISOString().slice(0, 10)})`),
+    ...(data.island ? { about: { '@type': 'Place', name: data.island } } : {}),
+  },
+  // Spread, not a ternary with `undefined` in it: the union that produces is
+  // awkward to type and the graph type is what BaseLayout promises.
+  ...(data.faq && data.faq.length > 0
+    ? [
+        {
+          '@type': 'FAQPage',
+          '@id': `${SITE.url}${localeUrl(locale, path)}#faq`,
+          mainEntity: data.faq.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        } satisfies Record<string, unknown>,
+      ]
+    : []),
+  breadcrumbNode([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+    { name: data.title, path },
+  ]),
+];
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  dateModified={updated}
+  jsonLd={jsonLd}
+>
+  <div class="shell py-6">
+    <nav aria-label="Breadcrumb" class="mb-5 text-xs text-[var(--color-muted)]">
+      <a href={localeUrl(locale, '/')} class="no-underline hover:underline">Home</a>
+      <span aria-hidden="true"> / </span>
+      <a href={localeUrl(locale, '/guides')} class="no-underline hover:underline">{t('guides.title')}</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{data.eyebrow}</span>
+    </nav>
+
+    <p class="eyebrow">{data.eyebrow}</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
+      {data.title}
+      <span class="rule" aria-hidden="true"></span>
+    </h1>
+
+    <p class="mt-3 max-w-prose text-[var(--color-ink-soft)]">{data.description}</p>
+
+    <div class="tabular mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-muted)]">
+      <span>By {data.author}</span>
+      <span>
+        Published <time datetime={published}>{published}</time>
+      </span>
+      {data.updated && <span>Updated <time datetime={updated}>{updated}</time></span>}
+      <span>Data verified <time datetime={verified}>{verified}</time></span>
+      <span>{wordCount} words</span>
+    </div>
+
+    <TrustBanner locale={locale} class="mt-6" />
+
+    <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_200px]">
+      <article class="doc prose-measure min-w-0">
+        <Content />
+
+        {
+          data.faq && data.faq.length > 0 && (
+            <section aria-labelledby="faq" class="mt-12">
+              <SectionHeading id="faq" as="h2" stripe="sea" size="lg">
+                Questions this page answers
+              </SectionHeading>
+              <dl class="space-y-4">
+                {data.faq.map((item: { q: string; a: string }) => (
+                  <div class="border-b border-[var(--color-border)] pb-4 last:border-0">
+                    <dt class="font-semibold text-[var(--color-ink)]">{item.q}</dt>
+                    <dd class="mt-1.5">{item.a}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )
+        }
+
+        <!--
+          The conversion. An article that does not send the reader into a planner
+          is a page written for a search engine, which is the one thing this
+          project is not for.
+        -->
+        <section aria-labelledby="guide-cta" class="mt-10">
+          <SectionHeading id="guide-cta" as="h2" stripe="aegean" size="lg">
+            Where to go next
+          </SectionHeading>
+          {
+            island ? (
+              <InstallCTA island={island} from={data.cta.from} to={data.cta.to} arrive={data.cta.arrive} />
+            ) : (
+              <Button href={cta}>{data.cta.label}</Button>
+            )
+          }
+          <p class="mt-3 text-sm text-[var(--color-muted)]">
+            <a href={localeUrl(locale, '/islands')} class="underline">Other islands</a> ·{' '}
+            <a href={localeUrl(locale, '/data/quality')} class="underline">What this data cannot tell you</a> ·{' '}
+            <a href={localeUrl(locale, '/data/changelog')} class="underline">Changelog</a>
+          </p>
+        </section>
+
+        <section aria-labelledby="guide-sources" class="mt-10">
+          <SectionHeading id="guide-sources" as="h2" stripe="muted" size="lg">
+            Sources
+          </SectionHeading>
+          <p class="text-sm">
+            Every figure on this page comes from the operator's own published schedule. Times are
+            scheduled, not live.
+          </p>
+          <ul class="mt-3 space-y-1.5">
+            {
+              data.sources.map((source) => (
+                <li class="flex flex-wrap items-baseline gap-x-2 text-sm">
+                  <Icon name="external" size={14} class="shrink-0 text-[var(--color-muted)]" />
+                  <a href={source.url} rel="nofollow noopener" target="_blank">
+                    {source.label}
+                  </a>
+                  <span class="tabular text-xs text-[var(--color-muted)]">
+                    retrieved {source.retrieved.toISOString().slice(0, 10)}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </article>
+
+      {
+        toc.length > 1 && (
+          <nav aria-labelledby="toc" class="order-first lg:order-none lg:sticky lg:top-24 lg:self-start">
+            <p id="toc" class="mb-2 text-[0.7rem] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+              On this page
+            </p>
+            <ul class="space-y-1 border-l border-[var(--color-border)] pl-3">
+              {toc.map((heading) => (
+                <li>
+                  <a
+                    href={`#${heading.slug}`}
+                    class="text-sm text-[var(--color-ink-soft)] no-underline hover:text-[var(--color-aegean)] hover:underline"
+                  >
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

@@ -327,12 +327,28 @@ The partition rule against cannibalisation, for when guides arrive: a guide's H1
 ferry`, `cheapest way`, `early morning`, `in <month>`, `on foot`…). If you cannot
 add one, you are writing a journey page, and the app already owns that.
 
-### 5.6 Pages that do not exist yet
+### 5.6 Guides — what is built, and what is deliberately not here
 
-Not built, deliberately, listed so nobody rebuilds them by accident: guides,
-per-island editorial, comparison pages, blog, operator entity pages, `/search`
-(offline-first means no site index; the 404 offers an external site-restricted
-search instead).
+`/guides` exists, with a content collection, a Zod schema, an editorial gate
+(`scripts/check-guides.mjs`), an RSS feed per locale, and two network-level
+articles: the ferry-to-bus connection page and the island-comparison page. The
+full playbook is `docs/content.md`.
+
+The structural point, which is the one worth repeating: **most of the
+traffic-winning content cannot live on the apex.** A page about one island's
+journey belongs on that island's subdomain, because the apex cannot rank for it
+and would compete with the app's own lookup pages. The apex gets the
+network-level layer, the comparison layer, and the trust layer everything else
+is cited against. The per-island guide clusters — the bigger half of the content
+job — are a separate piece of work in the engine repo.
+
+Not built, listed so nobody rebuilds them by accident: per-island guides,
+operator entity pages, a newsletter, `/search` (offline-first means no site
+index; the 404 offers an external site-restricted search instead).
+
+The editorial rules are enforced, not aspirational. A guide that breaks one does
+not ship: see the table in `docs/content.md` §4 and the gate in
+`scripts/check-guides.mjs`.
 
 ---
 
@@ -407,12 +423,15 @@ worse than one that admits the field is unfilled.
 
 9. `/en/network/` is drafted; it needs a human read and a few hundred more words
    on the ferry-connection reality per island.
-10. The **Naxos guide cluster** — this is where the site actually earns traffic:
-    hub guide, two ferry-arrival pages (highest intent, lowest competition in the
-    whole space), "which line to the beach" for the top beaches only, and "if you
-    miss the last bus", which nobody else writes.
-11. The cross-island **ferry-to-bus master page** with a per-island comparison
-    table. The highest-value page in the plan.
+10. The **Naxos guide cluster**, in the engine repo — this is where the site
+    actually earns traffic: hub guide, two ferry-arrival pages, "which line to
+    the beach" for the top beaches only, and "if you miss the last bus", which
+    nobody else writes. The collection and the gate are already built here and
+    can be pointed at the subdomain.
+11. German localisation of the guides, human-reviewed. Not the apex chrome — the
+    articles, which is where the volume is.
+12. The cross-island **ferry-to-bus master page** is written. Next: the
+    per-island ferry-arrival pages, which is where the volume is.
 12. German localisation of the apex and the Naxos guides, human-reviewed.
     Germany is the largest inbound market for the Cyclades and it is the one
     commercial differentiator against anglophone competition.

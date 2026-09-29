@@ -1,0 +1,115 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import type { GuideData } from '../../../content/schema';
+import { slugOf } from '../../../content/slug';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import Card from '../../../components/ui/Card.astro';
+import SectionHeading from '../../../components/ui/SectionHeading.astro';
+import { useTranslations } from '../../../i18n/ui';
+import { LOCALES, localeUrl } from '../../../i18n/utils';
+import { breadcrumbNode, organizationNode } from '../../../lib/jsonld';
+import { publishedLocalesFor, resolveLocale } from '../../../lib/page';
+
+export const getStaticPaths: GetStaticPaths = () => LOCALES.map((lang) => ({ params: { lang } }));
+
+const locale = resolveLocale(Astro.params.lang);
+const t = useTranslations(locale);
+const path = '/guides';
+const hreflangLocales = publishedLocalesFor(path);
+
+const entries = (
+  (await getCollection('guides', (e) => !e.data.draft)) as Array<CollectionEntry<'guides'> & { data: GuideData }>
+).sort(
+  (a, b) => b.data.published.getTime() - a.data.published.getTime(),
+);
+
+const CLUSTER_LABEL: Record<string, string> = {
+  'ferry-to-bus': 'Ferry to bus',
+  comparison: 'Comparison',
+  network: 'The network',
+  methodology: 'Our data',
+  season: 'Seasonal',
+};
+
+const date = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title={t('guides.title')}
+  description="Written answers about buses in the Cyclades: ferry connections, which island has the most useful network, and the things no timetable tells you. Every figure sourced and dated."
+  locale={locale}
+  pathname={localeUrl(locale, path)}
+  hreflangLocales={hreflangLocales}
+  jsonLd={[
+    organizationNode(),
+    breadcrumbNode([
+      { name: 'Home', path: '/' },
+      { name: 'Guides', path },
+    ]),
+  ]}
+>
+  <div class="shell-wide py-6">
+    <p class="eyebrow">{t('nav.guides')}</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
+      {t('guides.title')}
+      <span class="rule" aria-hidden="true"></span>
+    </h1>
+    <p class="prose-measure mt-3 text-[var(--color-ink-soft)]">{t('guides.lede')}</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      {
+        entries.map((entry) => {
+          const d = entry.data;
+          return (
+            <Card as="article" class="flex h-full flex-col">
+              <p class="text-[0.7rem] font-semibold uppercase tracking-wide text-[var(--color-aegean)]">
+                {CLUSTER_LABEL[d.cluster] ?? d.cluster}
+              </p>
+              <h2 class="mt-1.5 text-lg font-semibold leading-snug tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
+                <a href={localeUrl(locale, `/guides/${slugOf(entry.id)}`)} class="no-underline hover:underline">
+                  {d.title}
+                </a>
+              </h2>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-[var(--color-ink-soft)]">{d.description}</p>
+              <p class="tabular mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-[var(--color-border)] pt-3 text-xs text-[var(--color-muted)]">
+                <span>
+                  <time datetime={date(d.published)}>{date(d.published)}</time>
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>
+                  data verified <time datetime={date(d.verified)}>{date(d.verified)}</time>
+                </span>
+                <a
+                  href={localeUrl(locale, `/guides/${slugOf(entry.id)}`)}
+                  class="ml-auto inline-flex items-center gap-0.5 font-semibold text-[var(--brand)] no-underline hover:underline"
+                >
+                  Read
+                  <Icon name="chevron" size={14} class="-rotate-90" />
+                </a>
+              </p>
+            </Card>
+          );
+        })
+      }
+    </div>
+
+    <section class="mt-12">
+      <SectionHeading stripe="muted" size="lg">{t('guides.moreTitle')}</SectionHeading>
+      <p class="prose-measure text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        {t('guides.moreLede')}
+      </p>
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {
+          ['ferry-to-bus', 'comparison', 'network', 'season'].map((cluster) => (
+            <li class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs text-[var(--color-muted)]">
+              {CLUSTER_LABEL[cluster]}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

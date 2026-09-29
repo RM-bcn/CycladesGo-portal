@@ -19,6 +19,14 @@ const en: Record<string, string> = {
   'nav.islands': 'Islands',
   'nav.network': 'How it works',
   'nav.data': 'Our data',
+
+  'nav.guides': 'Guides',
+  'guides.title': 'Guides',
+  'guides.lede':
+    'Written answers about buses in the Cyclades.',
+  'guides.moreTitle': 'More clusters coming',
+  'guides.moreLede':
+    'These are the clusters we write in. Each one is a question people actually ask, answered with a number rather than an opinion.',
   'nav.about': 'About',
   'nav.sponsors': 'Sponsors',
   'nav.legal': 'Legal',
@@ -116,6 +124,14 @@ const el: Record<string, string> = {
   'nav.islands': 'Νησιά',
   'nav.network': 'Πώς λειτουργεί',
   'nav.data': 'Τα δεδομένα μας',
+
+  'nav.guides': 'Οδηγοί',
+  'guides.title': 'Οδηγοί',
+  'guides.lede':
+    'Γραπτές απαντήσεις για τα λεωφορεία στις Κυκλάδες.',
+  'guides.moreTitle': 'Περισσότερες θεματικές',
+  'guides.moreLede':
+    'Αυτές είναι οι θεματικές που γράφουμε. Κάθε μία είναι ερώτηση που κάνουν πραγματικά, με απάντηση αριθμό και όχι γνώμη.',
   'nav.about': 'Σχετικά',
   'nav.sponsors': 'Χορηγοί',
   'nav.legal': 'Νομικά',
@@ -216,6 +232,14 @@ const de: Record<string, string> = {
   'nav.islands': 'Inseln',
   'nav.network': 'So funktioniert es',
   'nav.data': 'Unsere Daten',
+
+  'nav.guides': 'Guides',
+  'guides.title': 'Guides',
+  'guides.lede':
+    'Schriftliche Antworten zu Bussen in den Kykladen.',
+  'guides.moreTitle': 'Weitere Themen',
+  'guides.moreLede':
+    'Das sind die Themen, zu denen wir schreiben. Jedes ist eine echte Frage, mit einer Zahl statt einer Meinung beantwortet.',
   'nav.about': 'Über uns',
   'nav.sponsors': 'Sponsoren',
   'nav.legal': 'Rechtliches',
@@ -316,6 +340,14 @@ const fr: Record<string, string> = {
   'nav.islands': 'Îles',
   'nav.network': 'Comment ça marche',
   'nav.data': 'Nos données',
+
+  'nav.guides': 'Guides',
+  'guides.title': 'Guides',
+  'guides.lede':
+    'Des réponses écrites sur les bus dans les Cyclades.',
+  'guides.moreTitle': 'Autres thèmes',
+  'guides.moreLede':
+    'Voici les thèmes sur lesquels nous écrivons. Chacun est une question réellement posée, avec un chiffre plutôt qu’un avis.',
   'nav.about': 'À propos',
   'nav.sponsors': 'Parrains',
   'nav.legal': 'Mentions légales',
@@ -416,6 +448,14 @@ const it: Record<string, string> = {
   'nav.islands': 'Isole',
   'nav.network': 'Come funziona',
   'nav.data': 'I nostri dati',
+
+  'nav.guides': 'Guide',
+  'guides.title': 'Guide',
+  'guides.lede':
+    'Risposte scritte sugli autobus nelle Cicladi.',
+  'guides.moreTitle': 'Altri temi',
+  'guides.moreLede':
+    'Questi sono i temi su cui scriviamo. Ognuno è una domanda reale, con una risposta numerica invece di un’opinione.',
   'nav.about': 'Chi siamo',
   'nav.sponsors': 'Sponsor',
   'nav.legal': 'Note legali',

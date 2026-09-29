@@ -71,6 +71,16 @@ const year = new Date().getFullYear();
           ))
         }
         <li>
+          <a href={href('/guides')} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+            {t('nav.guides')}
+          </a>
+        </li>
+        <li>
+          <a href="/en/guides/rss.xml" class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
+            RSS
+          </a>
+        </li>
+        <li>
           <a href={href('/data/methodology')} class="text-sm text-[var(--color-ink-soft)] no-underline hover:underline">
             {t('footer.methodology')}
           </a>

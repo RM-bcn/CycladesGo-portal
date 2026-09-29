@@ -102,6 +102,7 @@ allowlist.
 | `npm run preview` | `astro preview` over `dist/` | Nothing |
 | `npm run check` | `astro check`: Astro + TypeScript across 45 files | Any type error or Astro template error. Currently 0 errors, 0 warnings, 1 hint |
 | `npm run test` | `vitest run` over `tests/**` | The locale/hreflang contract, and the island-registry field order the two regex parsers depend on. 19 tests |
+| `npm run guides:check` | The editorial gate for guides, inside `npm run build` | A missing title modifier on an island guide, `updated` before `published`, a `verified` date over 120 days old, a source with no retrieval date, a CTA naming an unknown island, a body under 300 words, or a `faq` entry not answered in the visible prose |
 | `npm run audit:seo` | Post-build SEO/GEO gate over `dist/` | Missing `dist/`, or any of the ten checks in [docs/seo.md](docs/seo.md) |
 | `npm run generate:seo` | Writes `public/robots.txt` and `public/llms.txt` | Zero islands parsed from `src/data/islands.ts` |
 | `npm run assets` | Renders `favicon.svg`, `assets/logo-512.png`, `icons/icon-192.png`, `icons/icon-512.png`, `og.png`, `.well-known/security.txt` from one SVG | Missing `sharp` (a devDependency) |
@@ -144,8 +145,17 @@ scripts/
 tests/
   locale.test.ts        the hreflang and locale contract
   data.test.ts          registry shape + the JSON-LD builders
+  content/schema.ts     the guide Zod schema (see its comment for why it is here)
+  content/rules.ts      title modifiers and word-count floors, read by check-guides
+  content/slug.ts       entry id -> route slug (the glob loader keeps the extension)
+  content/guides/*.md   the guides themselves
+  guides/               the /guides index, [slug] template and RSS
+tests/
+  locale.test.ts        the hreflang and locale contract
+  data.test.ts          registry shape + the JSON-LD builders
 docs/
-  design/               31 screenshots
+  design/               41 screenshots
+  content.md            the growth playbook: clusters, format, rules, cadence
   seo.md                the operating manual audit-seo.ts implements
   legal.md              the compliance record
 public/                 generated assets plus robots.txt and llms.txt
@@ -350,6 +360,9 @@ A new agent should know all of these without opening `PLAN.md`:
   `correction_submitted` do not exist yet.
 - **The donation mechanism is not implemented.** `/sponsors` specifies it and the
   footer links to it; there is no payment code and no processor chosen.
+- **`/guides` holds two articles and both are network-level.** That is the whole
+  correct scope for the apex; the per-island guide clusters are the bigger half
+  of the content job and belong in the engine repo. See `docs/content.md` §1.
 - **The report form is switched off.** `/report` renders the real form markup
   with `novalidate` and no action, plus an e-mail fallback.
 - **No external accessibility audit** has been done. Known limitations are
