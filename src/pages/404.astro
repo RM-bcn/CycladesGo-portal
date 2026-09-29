@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/ui/Icon.astro';
+import DomeBadge from '../components/ui/DomeBadge.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Button from '../components/ui/Button.astro';
 import { ISLANDS } from '../data/islands';
 import { useTranslations } from '../i18n/ui';
 import { DEFAULT_LOCALE, localeUrl } from '../i18n/utils';
@@ -10,10 +13,18 @@ import { DEFAULT_LOCALE, localeUrl } from '../i18n/utils';
  * to resolve: the locale is hardcoded to English and the page is noindex with an
  * empty hreflang cluster, because a not-found page must never join a language
  * group or a translation cluster for content that does not exist.
+ *
+ * The voice is deliberate. On a bus network you get off at the wrong stop every
+ * time you are new to it, so the page says so and then hands you the stops that
+ * actually matter, as the same route rows the engine's home screen uses. A joke
+ * that is also the navigation is worth more than a joke.
  */
 const locale = DEFAULT_LOCALE;
 const t = useTranslations(locale);
 const pathname = '/404';
+
+/** Echo the URL that failed, so a mistyped path is visible rather than guessed. */
+const requested = Astro.url.pathname;
 
 const sections = [
   { href: '/islands', key: 'nav.islands', note: 'The five island planners' },
@@ -21,89 +32,64 @@ const sections = [
   { href: '/data', key: 'nav.data', note: 'Sources, known limits, changelog' },
   { href: '/about', key: 'nav.about', note: 'Who builds this' },
   { href: '/sponsors', key: 'nav.sponsors', note: 'What sponsorship buys' },
-  { href: '/report', key: 'footer.report', note: 'A wrong time or a timetable source' },
+  { href: '/report', key: 'footer.report', note: 'A wrong time, or a timetable to share' },
 ];
 ---
 
 <BaseLayout
-  title="Page not found"
-  description="That page does not exist. Search, or jump to the island planners, the data pages, or the homepage."
+  title="Wrong stop"
+  description="That page does not exist. Here are the island planners, the sections of this site, and a way to search."
   locale={locale}
   pathname={pathname}
   hreflangLocales={[]}
   noindex
 >
-  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
-    <p class="tabular text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">
-      404
-    </p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-4xl" style="letter-spacing: -0.03em;">
-      This page does not exist
+  <div class="shell py-6">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
+      This is the wrong stop
+      <span class="rule" aria-hidden="true"></span>
     </h1>
-    <p class="prose-measure mt-3 text-lg leading-relaxed text-[var(--color-ink-soft)]">
-      The address you followed is not here. That is usually a mistyped link or an old page that has
-      moved. Nothing is broken on your side, and nothing about the planner is affected: each island
-      planner is a separate site and works on its own.
-    </p>
 
-    <div class="mt-10">
-      <form
-        role="search"
-        action="https://duckduckgo.com/"
-        method="get"
-        class="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-cube)]"
-      >
-        <label for="site-search" class="block text-sm font-semibold text-[var(--color-ink)]">
-          Search for a page on this site
-        </label>
-        <p id="site-search-hint" class="mt-1 text-xs leading-relaxed text-[var(--color-muted)]">
-          There is no search index on this site, because an offline-first project has nowhere to put
-          one. This sends the search to an external engine, restricted to cycladesgo.com.
-        </p>
-        <div class="mt-3 flex flex-col gap-2 sm:flex-row">
-          <input
-            type="search"
-            id="site-search"
-            name="q"
-            aria-describedby="site-search-hint"
-            autocomplete="off"
-            class="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2.5 text-sm text-[var(--color-ink)]"
-          />
-          <input type="hidden" name="sites" value="cycladesgo.com" />
-          <button
-            type="submit"
-            class="inline-flex shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-2.5 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline transition-colors hover:bg-[var(--color-aegean-btn-hover)]"
-          >
-            Search
-            <Icon name="arrow" size={15} />
-          </button>
-        </div>
-      </form>
+    <div class="prose-measure mt-3 space-y-2 text-[var(--color-ink-soft)]">
+      <p>
+        You have reached a page that does not exist. On a bus network that happens to everyone: you
+        get off, you look around, and the harbour is somewhere behind you. The address you followed
+        is not here.
+      </p>
+      <p class="text-sm">
+        Nothing is broken on your side, and the planners are unaffected — each island is a separate
+        site and works on its own. Here is the stop you probably wanted.
+      </p>
     </div>
 
-    <nav aria-label="Sections of this site" class="mt-10">
-      <h2 class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-        Where to go instead
-      </h2>
-      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+    <!-- The engine's route rows: the same list idiom, used as navigation. -->
+    <nav aria-labelledby="wrong-stop-islands" class="mb-8">
+      <SectionHeading id="wrong-stop-islands" as="h2" stripe="aegean" size="lg" href={localeUrl(locale, '/islands')} action="All islands">
+        The island planners
+      </SectionHeading>
+      <ul class="flex flex-col gap-2">
         {
-          sections.map((section) => (
+          ISLANDS.map((island) => (
             <li>
               <a
-                href={localeUrl(locale, section.href)}
-                class="group flex h-full items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 no-underline transition-colors hover:border-[var(--color-aegean)] hover:bg-[var(--color-aegean-bg)]"
+                href={`${island.currentUrl}/en/`}
+                rel="noopener"
+                class="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-cube)] transition hover:shadow-[var(--shadow-lift)] no-underline"
               >
-                <Icon
-                  name="arrow"
-                  size={16}
-                  class="mt-1 shrink-0 text-[var(--color-aegean)]"
-                />
-                <span>
-                  <span class="block text-sm font-semibold text-[var(--color-ink)]">
-                    {t(section.key)}
-                  </span>
-                  <span class="mt-0.5 block text-sm text-[var(--color-muted)]">{section.note}</span>
-                </span>
+                <DomeBadge line={String(island.counts?.lines ?? 0)} color={island.accent} />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-semibold text-[var(--color-ink)]">
+                    {island.brand}{' '}
+                    <span class="font-normal text-[var(--color-muted)]">
+                      — {island.name} (<span lang="el">{island.nameEl}</span>)
+                    </span>
+                  </p>
+                  <p class="text-xs text-[var(--color-muted)]">
+                    {island.counts?.stops} stops · {island.operator.name}
+                  </p>
+                </div>
+                <Icon name="chevron" size={16} class="-rotate-90 shrink-0 text-[var(--color-muted)]" />
               </a>
             </li>
           ))
@@ -111,42 +97,75 @@ const sections = [
       </ul>
     </nav>
 
-    <section aria-labelledby="notfound-islands" class="mt-12">
-      <h2 id="notfound-islands" class="text-xl font-semibold tracking-tight text-[var(--color-ink)]" style="letter-spacing: -0.02em;">
-        Or pick an island
-      </h2>
-      <ul class="mt-4 flex flex-wrap gap-2">
-        {
-          ISLANDS.map((island) => (
-            <li>
-              <a
-                href={`${island.currentUrl}/en/`}
-                rel="noopener"
-                class="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-2 text-sm text-[var(--color-ink-soft)] no-underline transition-colors hover:border-[var(--color-aegean)] hover:text-[var(--color-aegean-deep)]"
-              >
-                {island.brand}
-                <Icon name="external" size={13} />
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+    <div class="grid gap-8 sm:grid-cols-[1fr_auto] sm:items-start">
+      <nav aria-labelledby="wrong-stop-sections">
+        <SectionHeading id="wrong-stop-sections" as="h2" stripe="sea">Or one of these</SectionHeading>
+        <ul class="flex flex-col gap-2">
+          {
+            sections.map((section) => (
+              <li>
+                <a
+                  href={localeUrl(locale, section.href)}
+                  class="flex items-baseline gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 no-underline transition-colors hover:bg-[var(--color-surface-2)]"
+                >
+                  <Icon name="arrow" size={15} class="shrink-0 translate-y-0.5 text-[var(--color-aegean)]" />
+                  <span>
+                    <span class="text-sm font-semibold text-[var(--color-ink)]">{t(section.key)}</span>
+                    <span class="ml-2 text-sm text-[var(--color-muted)]">{section.note}</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
 
-    <div class="mt-12 flex flex-wrap gap-3">
-      <a
-        href={localeUrl(locale, '/')}
-        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-aegean)] px-5 py-3 text-sm font-semibold text-[var(--color-aegean-btn-text)] no-underline transition-colors hover:bg-[var(--color-aegean-btn-hover)]"
+      <form
+        role="search"
+        action="https://duckduckgo.com/"
+        method="get"
+        class="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-cube)] sm:w-72"
       >
-        {t('common.backHome')}
-        <Icon name="arrow" size={16} />
-      </a>
-      <a
-        href={localeUrl(locale, '/islands')}
-        class="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-3 text-sm font-semibold text-[var(--color-ink-soft)] no-underline transition-colors hover:bg-[var(--color-surface-2)]"
-      >
-        {t('nav.islands')}
-      </a>
+        <label for="site-search" class="block text-sm font-semibold text-[var(--color-ink)]">
+          Search this site
+        </label>
+        <p id="site-search-hint" class="mt-1 text-xs leading-relaxed text-[var(--color-muted)]">
+          There is no search index here — an offline-first project has nowhere to put one. This sends
+          your query to an external engine, restricted to cycladesgo.com.
+        </p>
+        <input
+          type="search"
+          id="site-search"
+          name="q"
+          aria-describedby="site-search-hint"
+          autocomplete="off"
+          placeholder="bus timetable Naxos"
+          class="mt-3 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2.5 text-sm text-[var(--color-ink)]"
+        />
+        <input type="hidden" name="sites" value="cycladesgo.com" />
+        <Button type="submit" class="mt-2 w-full">
+          Search
+          <Icon name="arrow" size={15} />
+        </Button>
+      </form>
+    </div>
+
+    <div class="mt-10 border-t border-[var(--color-border)] pt-6">
+      <p class="text-xs text-[var(--color-muted)]">
+        You asked for <code class="tabular rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] px-1.5 py-0.5">{requested}</code>.
+        If you followed that from somewhere on this site and it should have worked, that is our bug,
+        not yours —
+        <a class="underline" href={localeUrl(locale, '/report')}>tell us and we will fix the link</a>.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <Button href={localeUrl(locale, '/')} size="md">
+          {t('common.backHome')}
+          <Icon name="arrow" size={16} />
+        </Button>
+        <Button href={localeUrl(locale, '/islands')} variant="secondary" size="md">
+          {t('nav.islands')}
+        </Button>
+      </div>
     </div>
   </div>
 </BaseLayout>

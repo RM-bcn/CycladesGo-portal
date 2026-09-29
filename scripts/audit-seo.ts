@@ -288,6 +288,51 @@ for (const p of indexable) {
   notes.push(`palette gate: ${scanned} .astro files, ${allowed.size} allowed token values`);
 }
 
+// 12. No nested anchors. A link inside a link is invalid HTML: the browser
+//     closes the outer one, so the card chrome stays behind and the content
+//     spills out. It renders visibly wrong and is invisible in a type check,
+//     which is exactly the class of defect a build gate is for.
+{
+  const strip = [
+    /\{\/\*[\s\S]*?\*\/\}/g,
+    /<!--[\s\S]*?-->/g,
+    /\/\*[\s\S]*?\*\//g,
+    /^\s*\/\/.*$/gm,
+  ];
+  const open = /<a\b/g;
+  const close = /<\/a\s*>/g; // the closing tag is split across lines in this codebase
+  const scan = (dir: string) => {
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) {
+        scan(full);
+        continue;
+      }
+      if (!/\.astro$/.test(entry)) continue;
+      let src = readFileSync(full, 'utf8');
+      for (const rx of strip) src = src.replace(rx, ' ');
+      const events: Array<[number, number]> = [
+        ...[...src.matchAll(open)].map((m) => [m.index, 1] as [number, number]),
+        ...[...src.matchAll(close)].map((m) => [m.index, -1] as [number, number]),
+      ].sort((a, b) => a[0] - b[0]);
+      let depth = 0;
+      for (const [, delta] of events) {
+        depth += delta;
+        if (depth > 1) {
+          failures.push(
+            `${path.relative(ROOT, full)}: a link is nested inside another link — invalid HTML that breaks the card layout`,
+          );
+          break;
+        }
+      }
+      if (depth !== 0) {
+        failures.push(`${path.relative(ROOT, full)}: unbalanced <a> tags (${events.length} open/close marks)`);
+      }
+    }
+  };
+  scan(path.join(ROOT, 'src'));
+}
+
 // --- report ---------------------------------------------------------------
 for (const n of notes) console.log(`  · ${n}`);
 if (failures.length) {

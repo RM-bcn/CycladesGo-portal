@@ -66,6 +66,8 @@ const PAGES = [
   { slug: '12-privacy', url: '/en/legal/privacy/', name: 'Privacy' },
   { slug: '13-accessibility', url: '/en/legal/accessibility/', name: 'Accessibility' },
   { slug: '14-untranslated-de', url: '/de/network/', name: 'Untranslated locale state' },
+  { slug: '15-404', url: '/404.html', name: '404 wrong stop' },
+  { slug: '16-500', url: '/500.html', name: '500 data failure' },
 ];
 
 await mkdir(OUT, { recursive: true });

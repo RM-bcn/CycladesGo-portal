@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Button from '../components/ui/Button.astro';
+import { ISLANDS } from '../data/islands';
+import { SITE } from '../data/site';
+import { useTranslations } from '../i18n/ui';
+import { DEFAULT_LOCALE, localeUrl } from '../i18n/utils';
+
+/*
+ * 500. A static site cannot serve a dynamic error, but the host can serve a
+ * static 500.html, and Vercel does. Without one the reader gets the provider's
+ * generic page, which loses the navigation and, more importantly, loses the
+ * operator's phone number — the one thing someone who landed here at 22:00 in
+ * a harbour actually needs.
+ *
+ * The wording is deliberately about the data, not the server: for this project
+ * the likeliest cause of a reader hitting an error is a dataset problem, and
+ * telling them "we would rather show you nothing than something stale" is both
+ * true and the right thing to hear.
+ */
+const locale = DEFAULT_LOCALE;
+const t = useTranslations(locale);
+---
+
+<BaseLayout
+  title="Something is wrong on our side"
+  description="The page could not be shown. The island planners are separate sites and are unaffected; each operator's contact details are on this page."
+  locale={locale}
+  pathname="/500"
+  hreflangLocales={[]}
+  noindex
+>
+  <div class="shell py-6">
+    <p class="eyebrow">Error 500</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-[var(--color-ink)]">
+      We could not show you that page
+      <span class="rule" aria-hidden="true"></span>
+    </h1>
+
+    <div class="prose-measure mt-3 space-y-2 text-[var(--color-ink-soft)]">
+      <p>
+        Something failed on our side, not in your browser. There is nothing you can fix, and retrying
+        the same address will fail the same way.
+      </p>
+      <p>
+        The island planners are separate sites and are not affected by a problem here. If you were
+        trying to reach one of them, the links below will work.
+      </p>
+      <p class="text-sm">
+        One thing worth saying plainly: this project refuses to publish a timetable once its
+        verification date has passed, so a data problem shows up as a page that is missing rather
+        than a page that is quietly out of date. If you arrived here looking for a schedule, the
+        operator below is the authoritative source — and they are the answer, not us.
+      </p>
+    </div>
+
+    <section aria-labelledby="err-islands" class="mb-8">
+      <SectionHeading id="err-islands" as="h2" stripe="aegean" size="lg">
+        Go straight to an island
+      </SectionHeading>
+      <ul class="grid items-start gap-2 sm:grid-cols-2">
+        {
+          ISLANDS.map((island) => (
+            <li>
+              {/*
+                Two links, never one inside the other. A nested <a> is invalid
+                HTML and the browser closes the outer one, which broke the card
+                layout. The card is a container here, not a link: on a failure
+                page the operator's number matters more than the app link, so
+                both get their own hit target.
+              */}
+              <div class="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-cube)]">
+                <p class="flex items-baseline justify-between gap-2">
+                  <a
+                    href={`${island.currentUrl}/en/`}
+                    rel="noopener"
+                    class="font-semibold text-[var(--color-ink)] no-underline hover:underline"
+                  >
+                    {island.brand}{' '}
+                    <span class="font-normal text-[var(--color-muted)]">— {island.name}</span>
+                  </a>
+                  <Icon name="chevron" size={16} class="-rotate-90 shrink-0 text-[var(--color-muted)]" />
+                </p>
+                {island.operator.phone ? (
+                  <p class="tabular mt-1.5 text-xs text-[var(--color-muted)]">
+                    <a
+                      href={`tel:${island.operator.phone.replace(/[^+\d]/g, '')}`}
+                      class="text-[var(--color-aegean)] underline underline-offset-2"
+                    >
+                      {island.operator.phone}
+                    </a>
+                  </p>
+                ) : (
+                  <p class="mt-1.5 text-xs text-[var(--color-muted)]">{island.operator.name}</p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+      <h2 class="flex items-center gap-2 text-sm font-semibold text-[var(--color-ink)]">
+        <Icon name="report" size={16} />
+        If it keeps happening
+      </h2>
+      <p class="mt-2 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-soft)]">
+        Tell us which address you were on and what you were trying to do. Every failure report for
+        this site is read.
+      </p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <Button href={`mailto:${SITE.email}`} variant="secondary" size="sm">
+          {SITE.email}
+        </Button>
+        <Button href={localeUrl(locale, '/report')} variant="secondary" size="sm">
+          {t('footer.report')}
+        </Button>
+        <Button href={localeUrl(locale, '/')} size="sm">
+          {t('common.backHome')}
+        </Button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

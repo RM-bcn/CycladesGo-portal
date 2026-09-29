@@ -51,10 +51,11 @@ const authorUrl = new URL(localeUrl(locale, '/about'), SITE.url).href;
     <a class="skip-link" href="#main">{t('nav.skip')}</a>
     <SiteHeader locale={locale} pathname={pathname} />
     {
-      /* An untranslated page is served so a visitor never hits a dead end, but it
-         is noindexed and carries no hreflang — see Seo.astro. Say so plainly
-         rather than letting a Greek reader think this is the Greek article. */
-      !hreflangLocales.includes(locale) && (
+      /* The banner is for a page that exists in English but not in the reader's
+         language. A page with no translations at all — the 404, the 500 — has an
+         empty cluster by design, and telling a lost visitor their language is
+         missing would be a second, worse error. */
+      hreflangLocales.length > 0 && !hreflangLocales.includes(locale) && (
         <div
           role="status"
           class="border-b border-[var(--color-sun)] bg-[var(--color-sun-bg)] px-4 py-2.5 text-center text-xs leading-relaxed text-[var(--color-sun-ink)] sm:px-6"
